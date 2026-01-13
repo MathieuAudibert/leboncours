@@ -4,12 +4,9 @@ Leboncours is a Single Page Application (SPA) where users can sign up as either 
 Project Name: "Leboncours"
 
 Tagline: A decentralized marketplace for micro-tutoring sessions.
-1. Executive Summary
-
-Leboncours is a Single Page Application (SPA) where users can sign up as either "Mentors" (who offer skills) or "Students" (who book sessions). It bridges the gap between casual learning and professional tutoring by allowing quick, one-off booking of video call sessions.
 
 Core Value: Speed, Simplicity, and Professional Management.
-2. Full Tech Stack Specification
+1. Full Tech Stack Specification
 Backend (The Engine)
 
     Language: Rust (Stable)
@@ -18,19 +15,17 @@ Backend (The Engine)
 
     ORM: SeaORM.
 
-        Why: Unlike raw SQLx, SeaORM provides a dynamic, async ORM that allows you to work with Rust structs ("Entities") directly. It auto-generates your Rust models from the database schema and handles complex relationships (like User has many Bookings) effortlessly.
-
     API Documentation: Utoipa (Generates OpenAPI/Swagger JSON directly from Rust structs/enums).
 
     Authentication: Argon2 + JWT (JSON Web Tokens).
 
-Database (The Vault)
+Database
 
     System: PostgreSQL 15+
 
     Management: SeaORM CLI (for migrations and entity generation).
 
-Frontend (The Face)
+Frontend
 
     Framework: React 18+ (using Vite).
 
@@ -38,15 +33,14 @@ Frontend (The Face)
 
     Data Grid: Ag Grid React.
 
-        Why: Used for the heavy-lifting dashboards. Instead of manually mapping <table> rows, Ag Grid handles sorting, filtering, and pagination of bookings and skills with high performance.
-
     State Management: TanStack Query (React Query).
 
     Styling: Tailwind CSS.
 
     HTTP Client: Axios.
 
-3. User Stories & Functional Requirements
+1. User Stories & Functional Requirements
+
 Role A: The Mentor
 
     Create Profile: Set display name, bio, and hourly rate.
@@ -63,9 +57,8 @@ Role B: The Student
 
     My Bookings (Ag Grid): A personal dashboard table showing past and upcoming sessions, filterable by date or status.
 
-4. Database Schema & SeaORM Integration
+3. Database Schema & SeaORM Integration
 
-You will use sea-orm-cli to generate Rust entities from these tables.
 Table 1: users
 
     id: UUID (Primary Key)
@@ -108,9 +101,7 @@ Table 3: bookings
 
     SeaORM Relation: BelongsTo users (Student), BelongsTo skills.
 
-5. API Design & Swagger Integration
-
-Utoipa will still be used to document the API. The difference is that your handlers will use SeaORM's ActiveModel to save data instead of writing raw SQL queries.
+4. API Design & Swagger Integration
 
 Key Endpoints:
 Group	Method	Path	Description
@@ -119,7 +110,8 @@ Skills	GET	/api/skills	Returns list of skills (supports pagination).
 Bookings	GET	/api/bookings	Optimized for Ag Grid: Accepts sorting/filtering params.
 Bookings	POST	/api/bookings	Create a new booking.
 Docs	GET	/swagger-ui	Interactive API docs.
-6. UI/UX Concept (The "Look")
+
+5. UI/UX Concept
 Public Pages (Landing & Search)
 
     Layout: Clean, card-based layout using Tailwind CSS.
@@ -127,8 +119,6 @@ Public Pages (Landing & Search)
     Visuals: Hero banner, search bar, and a grid of "Skill Cards".
 
 Private Dashboard (The "Ag Grid" Power View)
-
-This is where the application feels "Pro".
 
     Mentor Dashboard:
 
