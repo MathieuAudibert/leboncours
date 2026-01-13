@@ -4,7 +4,7 @@ agent: Gemini 3
 date: 13/01/2026
 ---
 
-- (Mathieu): From now on you are a postgres database specialist, generate me 200 lines for this database : 
+- (Mathieu): From now on you are a postgres database specialist, generate me 200 lines for this database : [attached file]
 
 - (Gemini 3): As a PostgreSQL specialist, I’ve reviewed your schema. 
 
