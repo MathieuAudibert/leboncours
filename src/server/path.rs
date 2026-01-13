@@ -1,4 +1,5 @@
 use utoipa::OpenApi;
+
 #[utoipa::path(get, path = "/", responses((status = 200, description = "Page d'accueil")))]
 pub async fn home_page() -> &'static str {
     "Home"
