@@ -3,8 +3,8 @@
 pub mod error;
 
 pub mod users;
-// pub mod skills;
-// pub mod bookings;
+pub mod skills;
+pub mod bookings;
 
 // Re-export shared error type
 pub use error::ApiError;
