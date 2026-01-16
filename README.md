@@ -103,13 +103,76 @@ Table 3: bookings
 
 4. API Design & Swagger Integration
 
-Key Endpoints:
-Group	Method	Path	Description
-Auth	POST	/api/auth/login	Returns JWT.
-Skills	GET	/api/skills	Returns list of skills (supports pagination).
-Bookings	GET	/api/bookings	Optimized for Ag Grid: Accepts sorting/filtering params.
-Bookings	POST	/api/bookings	Create a new booking.
-Docs	GET	/swagger-ui	Interactive API docs.
+## API Endpoints
+
+### Auth
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/login` | Login, returns JWT |
+| POST | `/api/auth/register` | Register new user |
+
+### Users
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/users` | List users (filter: role, name, email) |
+| GET | `/api/users/:id` | Get user by ID |
+| POST | `/api/users` | Create user |
+| PUT | `/api/users/:id` | Update user |
+| DELETE | `/api/users/:id` | Delete user |
+
+### Courses
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/courses` | List courses (filter: subject, level, price range) |
+| GET | `/api/courses/:id` | Get course details |
+| POST | `/api/courses` | Create course |
+| PUT | `/api/courses/:id` | Update course |
+| DELETE | `/api/courses/:id` | Delete course |
+
+### Availabilities
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/availabilities` | List slots (filter: courseId, date range) |
+| GET | `/api/availabilities/:id` | Get slot by ID |
+| POST | `/api/availabilities` | Create availability slot |
+| PUT | `/api/availabilities/:id` | Update slot |
+| DELETE | `/api/availabilities/:id` | Delete slot |
+
+### EventCourses (Bookings)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/event-courses` | List bookings (filter: studentId, state) |
+| GET | `/api/event-courses/:id` | Get booking details |
+| POST | `/api/event-courses` | Create booking (student books a course) |
+| PUT | `/api/event-courses/:id` | Update state (Pending→Confirmed→Done) |
+| DELETE | `/api/event-courses/:id` | Cancel booking |
+
+### TeacherCourses
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/teacher-courses` | List teacher-course assignments |
+| GET | `/api/teacher-courses/:id` | Get assignment by ID |
+| POST | `/api/teacher-courses` | Assign teacher to course |
+| DELETE | `/api/teacher-courses/:id` | Remove assignment |
+
+### Messages
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/messages` | List messages |
+| GET | `/api/messages/:id` | Get message by ID |
+| POST | `/api/messages` | Send message (creates message + messageUsers) |
+| DELETE | `/api/messages/:id` | Delete message |
+
+### MessageUsers
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/message-users` | List (filter: senderId, receiverId, userId) |
+| GET | `/api/message-users/:id` | Get by ID |
+
+### Docs
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/swagger-ui` | Interactive API documentation |
 
 5. UI/UX Concept
 Public Pages (Landing & Search)
