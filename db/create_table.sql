@@ -1,41 +1,59 @@
-CREATE TYPE course_state AS ENUM ('Available', 'Booked', 'Done');
-CREATE TYPE users_role AS ENUM ('Teacher', 'Student', 'Admin');
+CREATE TYPE users_role AS ENUM ('Teacher', 'Admin', 'Student');
+CREATE TYPE event_state AS ENUM ('Pending', 'Confirmed', 'Canceled', 'Done');
 
 CREATE TABLE Users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    firstname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
-    role users_role NOT NULL,
+    role users_role NOT NULL, 
     password VARCHAR(255) NOT NULL,
     metadata JSONB
 );
 
-CREATE TABLE EventCourses (
+CREATE TABLE Courses (
     id SERIAL PRIMARY KEY,
     subject VARCHAR(255) NOT NULL,
-    event_date TIMESTAMP NOT NULL,
-    hourly_price INTEGER NOT NULL,
+    hourly_price INT NOT NULL,
     level VARCHAR(255),
-    state course_state NOT NULL
+    description TEXT
+);
+
+CREATE TABLE Availabilities (
+    id SERIAL PRIMARY KEY,
+    start_date DATE,
+    end_date DATE,
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    course_id INT,
+    FOREIGN KEY (course_id) REFERENCES Courses(id) 
+);
+
+CREATE TABLE TeacherCourses (
+    id SERIAL PRIMARY KEY,
+    teacher_id INT,
+    course_id INT,
+    FOREIGN KEY (teacher_id) REFERENCES Users(id),
+    FOREIGN KEY (course_id) REFERENCES Courses(id)
+);
+
+CREATE TABLE EventCourses (
+    id SERIAL PRIMARY KEY,
+    student_id INT,
+    course_id INT,
+    dates TIMESTAMP,
+    state event_state NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES Users(id),
+    FOREIGN KEY (course_id) REFERENCES Courses(id)
 );
 
 CREATE TABLE Messages (
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
-    content TEXT NOT NULL
+    content TEXT
 );
 
-CREATE TABLE EventCourseUsers (
-    id SERIAL PRIMARY KEY,
-    fk_teacher_id INTEGER NOT NULL,
-    fk_student_id INTEGER,
-    fk_course_event_id INTEGER NOT NULL,
-    FOREIGN KEY (fk_course_event_id) REFERENCES EventCourses(id) ON DELETE CASCADE,
-    FOREIGN KEY (fk_student_id) REFERENCES Users(id),
-    FOREIGN KEY (fk_teacher_id) REFERENCES Users(id)
-);
-
-CREATE TABLE MessageUsers (
+CREATE TABLE MessagesUsers (
     id SERIAL PRIMARY KEY,
     sender_id INTEGER NOT NULL,
     receiver_id INTEGER NOT NULL,
@@ -45,8 +63,10 @@ CREATE TABLE MessageUsers (
     FOREIGN KEY (message_id) REFERENCES Messages(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_user_id ON Users(id);
-CREATE INDEX idx_event_course_id ON EventCourses(id);
-CREATE INDEX idx_message_id ON Messages(id);
-CREATE INDEX idx_event_course_user_id ON EventCourseUsers(id);
-CREATE INDEX idx_message_user_id ON MessageUsers(id);
+CREATE INDEX idx_users_id ON Users(id);
+CREATE INDEX idx_courses_id ON Courses(id);
+CREATE INDEX idx_availabilities_id ON Availabilities(id);
+CREATE INDEX idx_teacher_courses_id ON TeacherCourses(id);
+CREATE INDEX idx_event_courses_id ON EventCourses(id);
+CREATE INDEX idx_messages_id ON Messages(id);
+CREATE INDEX idx_messages_users_id ON MessagesUsers(id);
