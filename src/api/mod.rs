@@ -2,9 +2,13 @@
 
 pub mod error;
 
+pub mod availabilities;
+pub mod courses;
+pub mod eventCourses;
+pub mod messages;
+pub mod messagesUsers;
+pub mod teacherCourses;
 pub mod users;
-// pub mod skills;
-// pub mod bookings;
 
 // Re-export shared error type
 pub use error::ApiError;
