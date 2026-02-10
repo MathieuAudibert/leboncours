@@ -127,7 +127,7 @@ pub async fn list(
 // Update
 #[utoipa::path(
     put,
-    path = "/api/users/{id}",
+    path = "/api/users/edit/{id}",
     params(("id" = i32, Path, description = "User ID")),
     request_body = UpdateUserRequest,
     responses(
@@ -178,7 +178,7 @@ pub async fn update(
 // Delete
 #[utoipa::path(
     delete,
-    path = "/api/users/{id}",
+    path = "/api/users/delete/{id}",
     params(("id" = i32, Path, description = "User ID")),
     responses(
         (status = 204, description = "User deleted"),
