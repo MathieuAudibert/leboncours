@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Star,
   Users,
+  Info,
 } from 'lucide-react';
 import { MdFilterListOff } from 'react-icons/md';
 
@@ -52,10 +53,12 @@ const MOCK_COURSES = [
    ═══════════════════════════════════════ */
 function SubjectRenderer({ data }) {
   return (
-    <div className="courses-cell-subject">
+    <span className="courses-subject-row">
       <span className="courses-subject-name">{data.subject}</span>
-      <span className="courses-subject-desc">{data.description}</span>
-    </div>
+      <span className="courses-info-trigger" title={data.description}>
+        <Info size={15} className="courses-info-icon" />
+      </span>
+    </span>
   );
 }
 
@@ -118,7 +121,8 @@ const CoursesPage = memo(function CoursesPage() {
       minWidth: 260,
       filter: 'agTextColumnFilter',
       cellRenderer: SubjectRenderer,
-      autoHeight: true,
+      cellStyle: { overflow: 'visible' },
+      tooltipValueGetter: (params) => params.data.description,
     },
     {
       headerName: 'Teacher',
@@ -297,6 +301,8 @@ const CoursesPage = memo(function CoursesPage() {
             animateRows={true}
             enableCellTextSelection={true}
             suppressMovableColumns={false}
+            tooltipShowDelay={0}
+            tooltipHideDelay={3000}
           />
         </div>
 

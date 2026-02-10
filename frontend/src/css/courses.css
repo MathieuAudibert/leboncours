@@ -197,6 +197,7 @@
 .courses-grid-wrapper .ag-row {
   border-color: var(--color-border-light) !important;
   transition: background 120ms ease !important;
+  overflow: visible !important;
 }
 
 .courses-grid-wrapper .ag-row-even {
@@ -225,6 +226,19 @@
   padding-right: 20px !important;
 }
 
+.courses-grid-wrapper .ag-body-viewport {
+  overflow: visible !important;
+  overflow-y: auto !important;
+}
+
+.courses-grid-wrapper .ag-center-cols-viewport,
+.courses-grid-wrapper .ag-center-cols-container,
+.courses-grid-wrapper .ag-body-viewport,
+.courses-grid-wrapper .ag-center-cols-clipper {
+  overflow: visible !important;
+  overflow-y: auto !important;
+}
+
 .courses-grid-wrapper .ag-paging-panel {
   border-top: 1px solid var(--color-border) !important;
   background: var(--color-background) !important;
@@ -242,14 +256,12 @@
   border-radius: var(--radius-sm) !important;
 }
 
-/* ── Custom Cell — Subject (2 lines) ── */
-.courses-cell-subject {
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
-  gap: 2px !important;
-  padding-top: 10px !important;
-  padding-bottom: 10px !important;
+/* ── Custom Cell — Subject with info icon ── */
+.courses-subject-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .courses-subject-name {
@@ -257,16 +269,39 @@
   font-weight: 700;
   color: var(--color-text);
   line-height: 1.3;
-}
-
-.courses-subject-desc {
-  font-size: 12px;
-  color: var(--color-text-muted);
-  line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+}
+
+.courses-info-trigger {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: help;
+}
+
+.courses-info-icon {
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.courses-info-trigger:hover .courses-info-icon {
+  color: var(--color-primary);
+}
+
+/* ── AG Grid Tooltip Override ── */
+.ag-tooltip {
+  max-width: 300px !important;
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  font-family: var(--font-family) !important;
+  line-height: 1.6 !important;
+  color: var(--color-text) !important;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* ── Custom Cell — Teacher ── */
