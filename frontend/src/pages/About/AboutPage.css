@@ -1,0 +1,304 @@
+/* ═══════════════════════════════════
+   ABOUT PAGE STYLES
+   ═══════════════════════════════════ */
+
+/* Reuse shared classes from LandingPage.css:
+   .section, .section-header, .section-title,
+   .section-subtitle, .section-header--center,
+   .btn, .cta-card, .cta-title, .cta-subtitle,
+   .cta-actions, .glass-panel
+   ──────────────────────────────────── */
+
+/* ── Hero ── */
+.about-hero {
+  padding: 80px 0 60px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.about-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.about-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border: 1px solid rgba(255, 107, 53, 0.15);
+  border-radius: var(--radius-full);
+}
+
+.about-hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  color: var(--color-text);
+}
+
+.about-hero-highlight {
+  color: var(--color-primary);
+}
+
+.about-hero-subtitle {
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+/* ── Mission ── */
+.about-mission {
+  padding-top: 60px;
+}
+
+.mission-card {
+  text-align: center;
+  padding: 56px 48px;
+  border-radius: var(--radius-xl);
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.mission-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-xl);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  margin-bottom: 24px;
+}
+
+.mission-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.mission-text {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── Values ── */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.value-card {
+  padding: 32px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-base);
+}
+
+.value-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--value-color, var(--color-primary));
+}
+
+.value-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--value-color) 10%, transparent);
+  color: var(--value-color);
+  margin-bottom: 16px;
+}
+
+.value-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.value-desc {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* ── Timeline ── */
+.about-timeline {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.timeline {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 24px;
+}
+
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.timeline-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  background: var(--color-border);
+  margin: 8px 0;
+}
+
+.timeline-content {
+  padding: 8px 0 40px;
+}
+
+.timeline-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.timeline-desc {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* ── Tech Stack ── */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.tech-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 36px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.tech-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--tech-color);
+}
+
+.tech-icon {
+  color: var(--tech-color);
+}
+
+.tech-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tech-desc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.tech-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+/* ── CTA - reuse landing cta ── */
+.about-cta {
+  padding-bottom: 40px;
+}
+
+/* ═══════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tech-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding: 40px 0;
+  }
+
+  .about-hero-title {
+    font-size: 34px;
+  }
+
+  .mission-card {
+    padding: 40px 24px;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tech-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .timeline {
+    padding-left: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero-title {
+    font-size: 28px;
+  }
+
+  .tech-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
