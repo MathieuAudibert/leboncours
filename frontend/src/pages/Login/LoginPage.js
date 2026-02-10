@@ -1,13 +1,17 @@
 import React, { memo, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn, GraduationCap } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginPage = memo(function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const togglePassword = useCallback(() => {
     setShowPassword(prev => !prev);
@@ -20,11 +24,19 @@ const LoginPage = memo(function LoginPage() {
 
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
-    // Simulate — will connect to backend later
-    setTimeout(() => setLoading(false), 1500);
-    console.log('Login:', form);
-  }, [form]);
+    // Small delay to show spinner
+    setTimeout(() => {
+      const result = login(form.email, form.password);
+      setLoading(false);
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setError(result.error);
+      }
+    }, 600);
+  }, [form, login, navigate]);
 
   return (
     <div className="auth-page">
@@ -41,6 +53,9 @@ const LoginPage = memo(function LoginPage() {
               <h1 className="auth-title">Welcome back</h1>
               <p className="auth-subtitle">
                 Log in to your account to access your courses and messages.
+              </p>
+              <p className="auth-hint">
+                Demo: <strong>caca1 / caca1</strong> (Student) or <strong>caca2 / caca2</strong> (Teacher)
               </p>
             </div>
 
@@ -64,19 +79,19 @@ const LoginPage = memo(function LoginPage() {
             <form className="auth-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label" htmlFor="login-email">
-                  Email address
+                  Username
                 </label>
                 <div className="form-input-wrap">
                   <Mail size={18} className="form-input-icon" />
                   <input
                     id="login-email"
                     name="email"
-                    type="email"
-                    placeholder="you@example.com"
+                    type="text"
+                    placeholder="caca1 or caca2"
                     className="form-input"
                     value={form.email}
                     onChange={handleChange}
-                    autoComplete="email"
+                    autoComplete="username"
                     required
                   />
                 </div>
@@ -129,6 +144,10 @@ const LoginPage = memo(function LoginPage() {
                   </>
                 )}
               </button>
+
+              {error && (
+                <p className="auth-error">{error}</p>
+              )}
             </form>
 
             {/* Footer */}

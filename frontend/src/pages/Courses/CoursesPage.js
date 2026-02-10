@@ -12,6 +12,13 @@ import {
   Star,
   Users,
   Info,
+  X,
+  User,
+  Calendar,
+  Clock,
+  Euro,
+  MessageSquare,
+  CheckCircle,
 } from 'lucide-react';
 import { MdFilterListOff } from 'react-icons/md';
 
@@ -106,12 +113,147 @@ function CategoryRenderer({ value }) {
 }
 
 /* ═══════════════════════════════════════
+   BOOKING MODAL
+   ═══════════════════════════════════════ */
+function BookingModal({ course, onClose }) {
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [message, setMessage] = useState('');
+  const [booked, setBooked] = useState(false);
+
+  const handleBook = () => {
+    setBooked(true);
+    setTimeout(() => {
+      setBooked(false);
+      onClose();
+    }, 2000);
+  };
+
+  return (
+    <div className="booking-overlay" onClick={onClose}>
+      <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="booking-close" onClick={onClose}>
+          <X size={20} />
+        </button>
+
+        {booked ? (
+          <div className="booking-success">
+            <div className="booking-success-icon">
+              <CheckCircle size={48} />
+            </div>
+            <h3>Session Booked!</h3>
+            <p>Your booking request has been sent to the teacher.</p>
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="booking-header">
+              <div className="booking-badges">
+                <span className="courses-category-badge">{course.category}</span>
+                <span className={`courses-level courses-level--${course.level?.toLowerCase()}`}>
+                  {course.level}
+                </span>
+              </div>
+              <h2 className="booking-title">{course.subject}</h2>
+              <p className="booking-desc">{course.description}</p>
+            </div>
+
+            {/* Course details */}
+            <div className="booking-details">
+              <div className="booking-detail">
+                <User size={16} />
+                <span className="booking-detail-label">Teacher</span>
+                <span className="booking-detail-value">{course.teacher}</span>
+              </div>
+              <div className="booking-detail">
+                <Euro size={16} />
+                <span className="booking-detail-label">Price</span>
+                <span className="booking-detail-value booking-price">€{course.hourly_price}/hr</span>
+              </div>
+              <div className="booking-detail">
+                <Star size={16} className="courses-rating-star" />
+                <span className="booking-detail-label">Rating</span>
+                <span className="booking-detail-value">{course.rating} / 5</span>
+              </div>
+              <div className="booking-detail">
+                <Users size={16} />
+                <span className="booking-detail-label">Students</span>
+                <span className="booking-detail-value">{course.students} enrolled</span>
+              </div>
+            </div>
+
+            {/* Booking form */}
+            <div className="booking-form">
+              <div className="booking-field-row">
+                <div className="booking-field">
+                  <label className="booking-label">
+                    <Calendar size={14} />
+                    Preferred Date
+                  </label>
+                  <input
+                    type="date"
+                    className="booking-input"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                  />
+                </div>
+                <div className="booking-field">
+                  <label className="booking-label">
+                    <Clock size={14} />
+                    Preferred Time
+                  </label>
+                  <input
+                    type="time"
+                    className="booking-input"
+                    value={selectedTime}
+                    onChange={(e) => setSelectedTime(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="booking-field">
+                <label className="booking-label">
+                  <MessageSquare size={14} />
+                  Message (optional)
+                </label>
+                <textarea
+                  className="booking-textarea"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Any notes for the teacher..."
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="booking-actions">
+              <button className="btn btn--outline booking-cancel-btn" onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                className="btn btn--primary booking-book-btn"
+                onClick={handleBook}
+                disabled={!selectedDate || !selectedTime}
+              >
+                <Calendar size={16} />
+                Book Session
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════ */
 const CoursesPage = memo(function CoursesPage() {
   const gridRef = useRef(null);
   const [quickFilter, setQuickFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   const columnDefs = useMemo(() => [
     {
@@ -303,6 +445,7 @@ const CoursesPage = memo(function CoursesPage() {
             suppressMovableColumns={false}
             tooltipShowDelay={0}
             tooltipHideDelay={3000}
+            onRowClicked={(e) => setSelectedCourse(e.data)}
           />
         </div>
 
@@ -312,6 +455,14 @@ const CoursesPage = memo(function CoursesPage() {
           <span>Data refreshes automatically once the backend is connected.</span>
         </p>
       </div>
+
+      {/* Booking Modal */}
+      {selectedCourse && (
+        <BookingModal
+          course={selectedCourse}
+          onClose={() => setSelectedCourse(null)}
+        />
+      )}
     </div>
   );
 });

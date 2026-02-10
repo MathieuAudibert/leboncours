@@ -137,6 +137,13 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="hero-visual">
+            {/* Background decorations */}
+            <div className="hero-decor hero-decor--blob" />
+            <div className="hero-decor hero-decor--ring" />
+            <div className="hero-decor hero-decor--ring-sm" />
+            <div className="hero-decor hero-decor--dots" />
+            <div className="hero-decor hero-decor--line" />
+
             <div className="hero-card hero-card--1">
               <div className="hero-card-avatar">👨‍💻</div>
               <div>
