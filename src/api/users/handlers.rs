@@ -16,7 +16,7 @@ use crate::entities::users::{ActiveModel, Column, Entity};
 //Create
 #[utoipa::path(
     post,
-    path = "/api/users",
+    path = "/api/users/create",
     request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = UserResponse),
