@@ -9,6 +9,9 @@ pub async fn home_page() -> &'static str {
 #[openapi(
     paths(
         home_page,
+        // Auth
+        crate::api::auth::handlers::register,
+        crate::api::auth::handlers::login,
         // Users
         crate::api::users::handlers::create_user,
         crate::api::users::handlers::get_by_id,

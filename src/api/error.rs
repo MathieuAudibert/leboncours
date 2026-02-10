@@ -13,6 +13,7 @@ pub enum ApiError {
     NotFound(String),
     ValidationError(String),
     Conflict(String),
+    Unauthorized(String),
     InternalError(String),
 }
 
@@ -32,6 +33,7 @@ impl IntoResponse for ApiError {
             ApiError::NotFound(msg) => (StatusCode::NOT_FOUND, msg),
             ApiError::ValidationError(msg) => (StatusCode::BAD_REQUEST, msg),
             ApiError::Conflict(msg) => (StatusCode::CONFLICT, msg),
+            ApiError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, msg),
             ApiError::InternalError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
         };
 

@@ -7,6 +7,9 @@ use crate::api;
 pub fn path(state: DBState) -> Router {
     Router::new()
         .route("/", get(fn_path::home_page))
+        // Auth
+        .route("/api/auth/register", post(api::auth::register))
+        .route("/api/auth/login", post(api::auth::login))
         // Users
         .route("/api/users/create", post(api::users::create_user))
         .route("/api/users/all", get(api::users::list))
