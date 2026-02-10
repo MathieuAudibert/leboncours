@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import './SkeletonLoader.css';
+
 
 const SkeletonLoader = memo(function SkeletonLoader({
   width = '100%',

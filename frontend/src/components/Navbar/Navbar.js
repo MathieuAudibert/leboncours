@@ -1,7 +1,7 @@
 import React, { useState, useCallback, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, User, LogIn } from 'lucide-react';
-import './Navbar.css';
+import { Search, Menu, X, User, LogIn, GraduationCap } from 'lucide-react';
+
 
 const Navbar = memo(function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -29,7 +29,7 @@ const Navbar = memo(function Navbar() {
       <div className="navbar-inner container">
         {/* Logo */}
         <Link to="/" className="navbar-logo" onClick={closeMobile}>
-          <span className="logo-icon">📚</span>
+          <GraduationCap size={28} className="logo-icon-svg" />
           <span className="logo-text">leboncours</span>
         </Link>
 
@@ -49,8 +49,8 @@ const Navbar = memo(function Navbar() {
           </button>
         </form>
 
-        {/* Desktop Nav */}
-        <div className="navbar-links">
+        {/* Desktop Nav Links - next to search */}
+        <div className="navbar-nav">
           <Link
             to="/"
             className={`nav-link ${isActive('/') ? 'nav-link--active' : ''}`}
@@ -63,15 +63,24 @@ const Navbar = memo(function Navbar() {
           >
             About
           </Link>
-          <div className="nav-divider" />
-          <button className="nav-btn nav-btn--outline">
+          <Link
+            to="/courses"
+            className={`nav-link ${isActive('/courses') ? 'nav-link--active' : ''}`}
+          >
+            Courses
+          </Link>
+        </div>
+
+        {/* Auth Buttons - pushed right */}
+        <div className="navbar-auth">
+          <Link to="/login" className="nav-btn nav-btn--outline">
             <LogIn size={16} />
             <span>Log in</span>
-          </button>
-          <button className="nav-btn nav-btn--primary">
+          </Link>
+          <Link to="/signup" className="nav-btn nav-btn--primary">
             <User size={16} />
             <span>Sign up</span>
-          </button>
+          </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -102,9 +111,10 @@ const Navbar = memo(function Navbar() {
             </form>
             <Link to="/" className="mobile-link" onClick={closeMobile}>Home</Link>
             <Link to="/about" className="mobile-link" onClick={closeMobile}>About</Link>
+            <Link to="/courses" className="mobile-link" onClick={closeMobile}>Courses</Link>
             <div className="mobile-divider" />
-            <button className="mobile-btn mobile-btn--outline">Log in</button>
-            <button className="mobile-btn mobile-btn--primary">Sign up</button>
+            <Link to="/login" className="mobile-btn mobile-btn--outline" onClick={closeMobile}>Log in</Link>
+            <Link to="/signup" className="mobile-btn mobile-btn--primary" onClick={closeMobile}>Sign up</Link>
           </div>
         </div>
       )}

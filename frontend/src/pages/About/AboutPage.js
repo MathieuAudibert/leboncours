@@ -14,7 +14,7 @@ import { MdHandshake, MdSpeed, MdDiversity3 } from 'react-icons/md';
 import { FaGithub } from 'react-icons/fa';
 import { GoRocket } from 'react-icons/go';
 import { SiRust, SiReact, SiPostgresql } from 'react-icons/si';
-import './AboutPage.css';
+
 
 /* ===== Data ===== */
 const VALUES = [
@@ -83,7 +83,7 @@ const TECH = [
   { icon: SiRust, name: 'Rust', desc: 'Backend engine', color: '#DEA584' },
   { icon: Server, name: 'Axum', desc: 'Web framework', color: '#7C3AED' },
   { icon: SiReact, name: 'React', desc: 'Frontend UI', color: '#61DAFB' },
-  { icon: SiPostgresql, name: 'PostgreSQL', desc: 'Database', color: '#336791' },
+  { icon: SiPostgresql, name: 'PostgreSQL', desc: 'Database (Aiven)', color: '#336791' },
 ];
 
 /* ===== Sub-Components ===== */
@@ -208,7 +208,7 @@ export default function AboutPage() {
           </div>
           <div className="tech-cta">
             <a
-              href="https://github.com"
+              href="https://github.com/MathieuAudibert/leboncours"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn--outline btn--lg"

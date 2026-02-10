@@ -25,7 +25,7 @@ import {
 } from 'react-icons/md';
 import { GoRocket, GoVerified } from 'react-icons/go';
 import { SkeletonCard } from '../../components/SkeletonLoader/SkeletonLoader';
-import './LandingPage.css';
+
 
 /* ===== Category Data ===== */
 const CATEGORIES = [
@@ -157,7 +157,7 @@ export default function LandingPage() {
               <div className="hero-card-price">€25/hr</div>
             </div>
             <div className="hero-card hero-card--3">
-              <div className="hero-card-avatar">🇫🇷</div>
+              <div className="hero-card-avatar">🗣️</div>
               <div>
                 <div className="hero-card-name">Pierre D.</div>
                 <div className="hero-card-skill">French for Beginners</div>

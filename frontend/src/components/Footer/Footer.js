@@ -2,8 +2,8 @@ import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { FaGithub, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import { SiRust, SiReact, SiPostgresql } from 'react-icons/si';
-import { Heart } from 'lucide-react';
-import './Footer.css';
+import { Heart, GraduationCap } from 'lucide-react';
+
 
 const Footer = memo(function Footer() {
   const currentYear = new Date().getFullYear();
@@ -15,7 +15,7 @@ const Footer = memo(function Footer() {
           {/* Brand */}
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
-              <span className="footer-logo-icon">📚</span>
+              <GraduationCap size={24} className="footer-logo-icon-svg" />
               <span className="footer-logo-text">leboncours</span>
             </Link>
             <p className="footer-tagline">
@@ -25,7 +25,7 @@ const Footer = memo(function Footer() {
             <div className="footer-tech">
               <span className="tech-badge"><SiRust size={14} /> Rust</span>
               <span className="tech-badge"><SiReact size={14} /> React</span>
-              <span className="tech-badge"><SiPostgresql size={14} /> PostgreSQL</span>
+              <span className="tech-badge"><SiPostgresql size={14} /> PostgreSQL (Aiven)</span>
             </div>
           </div>
 
@@ -68,7 +68,7 @@ const Footer = memo(function Footer() {
             © {currentYear} Leboncours. Made with <Heart size={14} className="footer-heart" /> for learners everywhere.
           </p>
           <div className="footer-socials">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="GitHub">
+            <a href="https://github.com/MathieuAudibert/leboncours" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="GitHub">
               <FaGithub size={20} />
             </a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
