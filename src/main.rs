@@ -1,6 +1,8 @@
 use dotenvy::dotenv;
 mod server;
 mod database;
+mod entities;
+mod api;
 
 #[derive(Clone)] // Cloner le pointeur de la DB
 pub struct DBState {

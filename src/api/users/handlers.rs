@@ -5,12 +5,10 @@ use axum::{
 };
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, Set};
 use validator::Validate;
-
 use super::dto::{CreateUserRequest, UpdateUserRequest, UserQueryParams, UserResponse};
 use crate::api::common::{hash_password, PaginatedResponse};
 use crate::api::error::ApiError;
 use crate::DBState;
-
 use crate::entities::users::{ActiveModel, Column, Entity};
 
 //Create
@@ -25,7 +23,7 @@ use crate::entities::users::{ActiveModel, Column, Entity};
     ),
     tag = "Users"
 )]
-pub async fn create(
+pub async fn create_user(
     State(state): State<DBState>,
     Json(payload): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<UserResponse>), ApiError> {

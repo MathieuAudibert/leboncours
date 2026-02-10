@@ -6,7 +6,7 @@ use crate::DBState;
 mod fn_path;
 mod api_routes;
 
-const ADDRESS: &str = "127.0.0.1:3000";
+const ADDRESS: &str = "127.0.0.1:3001";
 
 pub async fn server_path(state: DBState) {
     let app = Router::new()

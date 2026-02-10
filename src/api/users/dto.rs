@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
+use utoipa::r#gen::serde_json;
 use validator::Validate;
+use crate::api::common;
+use crate::entities::sea_orm_active_enums::UsersRole;
 
 // Create
 #[derive(Debug, Deserialize, Validate, ToSchema)]
@@ -11,8 +14,7 @@ pub struct CreateUserRequest {
     pub firstname: String,
     #[validate(email, length(max = 255))]
     pub email: String,
-    #[validate(length(min = 1, max = 50))]
-    pub role: String,
+    pub role: UsersRole,  // Utilise le type SeaORM directement
     #[validate(length(min = 8, max = 255))]
     pub password: String,
     pub metadata: Option<serde_json::Value>,
@@ -27,8 +29,7 @@ pub struct UpdateUserRequest {
     pub firstname: Option<String>,
     #[validate(email, length(max = 255))]
     pub email: Option<String>,
-    #[validate(length(min = 1, max = 50))]
-    pub role: Option<String>,
+    pub role: Option<UsersRole>,  // Option si tu veux qu'il soit optionnel dans l'update
     #[validate(length(min = 8, max = 255))]
     pub password: Option<String>,
     pub metadata: Option<serde_json::Value>,
