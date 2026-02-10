@@ -2,6 +2,8 @@
 
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::fmt;
+use utoipa::ToSchema;
 
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "event_state")]
@@ -15,7 +17,7 @@ pub enum EventState {
     #[sea_orm(string_value = "Done")]
     Done,
 }
-#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ToSchema)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "users_role")]
 pub enum UsersRole {
     #[sea_orm(string_value = "Teacher")]
@@ -24,4 +26,14 @@ pub enum UsersRole {
     Admin,
     #[sea_orm(string_value = "Student")]
     Student,
+}
+
+impl fmt::Display for UsersRole {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            UsersRole::Teacher => write!(f, "Teacher"),
+            UsersRole::Admin => write!(f, "Admin"),
+            UsersRole::Student => write!(f, "Student"),
+        }
+    }
 }

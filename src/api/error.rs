@@ -3,7 +3,6 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
-use validator::{Validate, ValidationError};
 
 use serde::Serialize;
 use utoipa::ToSchema;

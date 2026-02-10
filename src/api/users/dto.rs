@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use utoipa::r#gen::serde_json;
 use validator::Validate;
-use crate::api::common;
 use crate::entities::sea_orm_active_enums::UsersRole;
 
 // Create
