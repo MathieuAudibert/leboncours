@@ -12,4 +12,3 @@ pub mod messageUsers;
 pub mod common;
 
 // Re-export shared error type
-pub use error::ApiError;

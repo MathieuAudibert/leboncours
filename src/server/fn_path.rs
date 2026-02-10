@@ -12,7 +12,7 @@ pub async fn all_courses() -> &'static str {
     "All Courses"
 }
 
-#[utoipa::path(get, path = "/api/course/{id}", responses((status = 200, description = "Détails du cours récupérés", body = String)),
+#[utoipa::path(get, path = "/api/course/:id", responses((status = 200, description = "Détails du cours récupérés", body = String)),
     params(
         ("id" = u32, Path, description = "L'identifiant unique du cours")
     )
