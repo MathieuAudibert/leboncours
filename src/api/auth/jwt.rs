@@ -10,27 +10,32 @@ use crate::api::error::ApiError;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
-    pub sub: i32,       // user id
+    #[serde(rename = "sub")]
+    pub user_id: i32,
     pub email: String,
     pub role: String,
-    pub exp: usize,     // expiration timestamp
-    pub iat: usize,     // issued at
+    #[serde(rename = "exp")]
+    pub expires_at: usize,
+    #[serde(rename = "iat")]
+    pub issued_at: usize,
 }
 
-/// Crée un JWT pour un utilisateur
+fn get_jwt_secret() -> Result<String, ApiError> {
+    std::env::var("JWT_SECRET")
+        .map_err(|_| ApiError::InternalError("JWT_SECRET not set in environment".into()))
+}
+
 pub fn create_token(user_id: i32, email: &str, role: &str) -> Result<String, ApiError> {
-    let secret = std::env::var("JWT_SECRET")
-        .unwrap_or_else(|_| "default-secret-change-me-in-production".to_string());
+    let secret = get_jwt_secret()?;
 
     let now = chrono::Utc::now();
-    let exp = (now + chrono::Duration::hours(24)).timestamp() as usize;
 
     let claims = Claims {
-        sub: user_id,
+        user_id,
         email: email.to_string(),
         role: role.to_string(),
-        exp,
-        iat: now.timestamp() as usize,
+        expires_at: (now + chrono::Duration::hours(24)).timestamp() as usize,
+        issued_at: now.timestamp() as usize,
     };
 
     encode(
@@ -43,8 +48,7 @@ pub fn create_token(user_id: i32, email: &str, role: &str) -> Result<String, Api
 
 /// Décode et vérifie un JWT
 pub fn verify_token(token: &str) -> Result<Claims, ApiError> {
-    let secret = std::env::var("JWT_SECRET")
-        .unwrap_or_else(|_| "default-secret-change-me-in-production".to_string());
+    let secret = get_jwt_secret()?;
 
     decode::<Claims>(
         token,
@@ -55,8 +59,7 @@ pub fn verify_token(token: &str) -> Result<Claims, ApiError> {
     .map_err(|e| ApiError::Unauthorized(format!("Invalid token: {}", e)))
 }
 
-/// Extractor Axum — injecte le user authentifié dans les handlers
-/// Usage: `async fn my_handler(auth: AuthUser) -> ... { auth.user_id }`
+/// injecte le user authentifié dans les handlers
 #[derive(Debug, Clone)]
 pub struct AuthUser {
     pub user_id: i32,
@@ -100,7 +103,7 @@ where
         let claims = verify_token(token)?;
 
         Ok(AuthUser {
-            user_id: claims.sub,
+            user_id: claims.user_id,
             email: claims.email,
             role: claims.role,
         })
