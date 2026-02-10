@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use utoipa::ToSchema;
 
-#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ToSchema)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "event_state")]
 pub enum EventState {
     #[sea_orm(string_value = "Pending")]
@@ -16,6 +16,17 @@ pub enum EventState {
     Canceled,
     #[sea_orm(string_value = "Done")]
     Done,
+}
+
+impl fmt::Display for EventState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            EventState::Pending => write!(f, "Pending"),
+            EventState::Confirmed => write!(f, "Confirmed"),
+            EventState::Canceled => write!(f, "Canceled"),
+            EventState::Done => write!(f, "Done"),
+        }
+    }
 }
 #[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize, ToSchema)]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "users_role")]
