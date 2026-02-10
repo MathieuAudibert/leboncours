@@ -84,7 +84,7 @@ pub async fn get_by_id(
 // List
 #[utoipa::path(
     get,
-    path = "/api/users",
+    path = "/api/users/all",
     params(UserQueryParams),
     responses(
         (status = 200, description = "List of users", body = PaginatedResponse<UserResponse>)
