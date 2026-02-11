@@ -1,0 +1,269 @@
+import React, { memo } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  Search,
+  CalendarCheck,
+  Video,
+  Star,
+  Users,
+  BookOpen,
+  Clock,
+  Shield,
+  Zap,
+  ChevronRight,
+} from 'lucide-react';
+import {
+  MdSchool,
+  MdMusicNote,
+  MdCode,
+  MdBrush,
+  MdScience,
+  MdCalculate,
+  MdTranslate,
+  MdFitnessCenter,
+} from 'react-icons/md';
+import { GoRocket, GoVerified } from 'react-icons/go';
+import { SkeletonCard } from '../../components/SkeletonLoader/SkeletonLoader';
+
+
+/* ===== Category Data ===== */
+const CATEGORIES = [
+  { name: 'Programming', icon: MdCode, color: '#3B82F6', count: 234 },
+  { name: 'Music', icon: MdMusicNote, color: '#8B5CF6', count: 187 },
+  { name: 'Languages', icon: MdTranslate, color: '#10B981', count: 312 },
+  { name: 'Mathematics', icon: MdCalculate, color: '#F59E0B', count: 156 },
+  { name: 'Science', icon: MdScience, color: '#EF4444', count: 98 },
+  { name: 'Art & Design', icon: MdBrush, color: '#EC4899', count: 145 },
+  { name: 'Academics', icon: MdSchool, color: '#6366F1', count: 203 },
+  { name: 'Fitness', icon: MdFitnessCenter, color: '#14B8A6', count: 76 },
+];
+
+/* ===== Step Data ===== */
+const STEPS = [
+  {
+    icon: Search,
+    title: 'Find your mentor',
+    desc: 'Browse through skill cards and find the perfect mentor for your needs.',
+  },
+  {
+    icon: CalendarCheck,
+    title: 'Book a session',
+    desc: 'Pick a time that suits you from your mentor\'s available slots.',
+  },
+  {
+    icon: Video,
+    title: 'Learn & grow',
+    desc: 'Join a one-on-one video call and gain practical knowledge instantly.',
+  },
+];
+
+/* ===== Stats Data ===== */
+const STATS = [
+  { icon: Users, value: '10k+', label: 'Active Users' },
+  { icon: BookOpen, value: '2.5k+', label: 'Courses Available' },
+  { icon: Star, value: '4.9', label: 'Average Rating' },
+  { icon: Clock, value: '50k+', label: 'Hours of Tutoring' },
+];
+
+/* ===== Sub-Components ===== */
+const CategoryCard = memo(function CategoryCard({ name, icon: Icon, color, count }) {
+  return (
+    <button className="category-card" style={{ '--cat-color': color }}>
+      <div className="category-icon-wrap">
+        <Icon size={28} />
+      </div>
+      <span className="category-name">{name}</span>
+      <span className="category-count">{count} courses</span>
+    </button>
+  );
+});
+
+const StepCard = memo(function StepCard({ icon: Icon, title, desc, index }) {
+  return (
+    <div className="step-card">
+      <div className="step-number">{index + 1}</div>
+      <div className="step-icon-wrap">
+        <Icon size={28} />
+      </div>
+      <h3 className="step-title">{title}</h3>
+      <p className="step-desc">{desc}</p>
+    </div>
+  );
+});
+
+const StatItem = memo(function StatItem({ icon: Icon, value, label }) {
+  return (
+    <div className="stat-item">
+      <Icon size={24} className="stat-icon" />
+      <span className="stat-value">{value}</span>
+      <span className="stat-label">{label}</span>
+    </div>
+  );
+});
+
+/* ===== Landing Page ===== */
+export default function LandingPage() {
+  return (
+    <div className="landing">
+      {/* ── Hero ── */}
+      <section className="hero">
+        <div className="container hero-inner">
+          <div className="hero-content">
+            <div className="hero-badge">
+              <GoRocket size={14} />
+              <span>The #1 Micro-Tutoring Platform</span>
+            </div>
+            <h1 className="hero-title">
+              Learn anything,<br />
+              from <span className="hero-highlight">anyone</span>
+            </h1>
+            <p className="hero-subtitle">
+              Book one-on-one video sessions with skilled mentors.
+              From code reviews to guitar lessons — fast, simple, and affordable.
+            </p>
+            <div className="hero-actions">
+              <button className="btn btn--primary btn--lg">
+                <span>Get Started</span>
+                <ArrowRight size={18} />
+              </button>
+              <Link to="/about" className="btn btn--ghost btn--lg">
+                Learn More
+              </Link>
+            </div>
+            <div className="hero-trust">
+              <GoVerified size={16} className="trust-icon" />
+              <span>Trusted by 10,000+ learners worldwide</span>
+            </div>
+          </div>
+          <div className="hero-visual">
+            {/* Background decorations */}
+            <div className="hero-decor hero-decor--blob" />
+            <div className="hero-decor hero-decor--ring" />
+            <div className="hero-decor hero-decor--ring-sm" />
+            <div className="hero-decor hero-decor--dots" />
+            <div className="hero-decor hero-decor--line" />
+
+            <div className="hero-card hero-card--1">
+              <div className="hero-card-avatar">👨‍💻</div>
+              <div>
+                <div className="hero-card-name">Alex M.</div>
+                <div className="hero-card-skill">Rust & Systems</div>
+              </div>
+              <div className="hero-card-rating">
+                <Star size={14} fill="#F59E0B" stroke="#F59E0B" />
+                <span>4.9</span>
+              </div>
+            </div>
+            <div className="hero-card hero-card--2">
+              <div className="hero-card-avatar">🎸</div>
+              <div>
+                <div className="hero-card-name">Sophie L.</div>
+                <div className="hero-card-skill">Guitar & Music Theory</div>
+              </div>
+              <div className="hero-card-price">€25/hr</div>
+            </div>
+            <div className="hero-card hero-card--3">
+              <div className="hero-card-avatar">🗣️</div>
+              <div>
+                <div className="hero-card-name">Pierre D.</div>
+                <div className="hero-card-skill">French for Beginners</div>
+              </div>
+              <div className="hero-card-badge">
+                <Shield size={12} />
+                Verified
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Categories ── */}
+      <section className="section categories-section">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Browse by category</h2>
+            <button className="section-link">
+              See all <ChevronRight size={16} />
+            </button>
+          </div>
+          <div className="categories-grid">
+            {CATEGORIES.map((cat) => (
+              <CategoryCard key={cat.name} {...cat} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ── */}
+      <section className="section steps-section">
+        <div className="container">
+          <div className="section-header section-header--center">
+            <h2 className="section-title">How it works</h2>
+            <p className="section-subtitle">
+              Get started in three simple steps
+            </p>
+          </div>
+          <div className="steps-grid">
+            {STEPS.map((step, i) => (
+              <StepCard key={step.title} {...step} index={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Featured (Skeleton) ── */}
+      <section className="section featured-section">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Featured courses</h2>
+            <button className="section-link">
+              Browse all <ChevronRight size={16} />
+            </button>
+          </div>
+          <div className="featured-grid">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+          <p className="featured-note">
+            <Zap size={14} />
+            Course listings will appear once the backend is connected.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Stats ── */}
+      <section className="section stats-section">
+        <div className="container">
+          <div className="stats-grid glass-panel">
+            {STATS.map((s) => (
+              <StatItem key={s.label} {...s} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="section cta-section">
+        <div className="container">
+          <div className="cta-card">
+            <h2 className="cta-title">Ready to start learning?</h2>
+            <p className="cta-subtitle">
+              Join thousands of learners and mentors on the fastest growing tutoring marketplace.
+            </p>
+            <div className="cta-actions">
+              <button className="btn btn--primary btn--lg">
+                Sign up free
+                <ArrowRight size={18} />
+              </button>
+              <button className="btn btn--outline btn--lg">
+                Become a Mentor
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

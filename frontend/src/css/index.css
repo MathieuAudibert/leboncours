@@ -1,0 +1,17 @@
+/* ═══════════════════════════════════
+   MAIN CSS ENTRY POINT
+   Import order matters: tokens → reset → shared → components → layout → pages
+   ═══════════════════════════════════ */
+
+@import './variables.css';
+@import './reset.css';
+@import './shared.css';
+@import './components.css';
+@import './navbar.css';
+@import './footer.css';
+@import './landing.css';
+@import './about.css';
+@import './auth.css';
+@import './courses.css';
+@import './profile.css';
+@import './dashboard.css';
