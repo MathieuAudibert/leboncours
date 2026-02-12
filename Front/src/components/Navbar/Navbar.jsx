@@ -42,22 +42,6 @@ const Navbar = memo(function Navbar() {
           <span className="logo-text">leboncours</span>
         </Link>
 
-        {/* Search Bar - Desktop */}
-        <form className="navbar-search" onSubmit={handleSearchSubmit}>
-          <Search size={18} className="search-icon" aria-hidden="true" />
-          <input
-            type="text"
-            placeholder="Search for courses, mentors, skills..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-            aria-label="Search courses"
-          />
-          <button type="submit" className="search-btn" aria-label="Submit search">
-            Search
-          </button>
-        </form>
-
         {/* Desktop Nav Links - next to search */}
         <div className="navbar-nav">
           <Link

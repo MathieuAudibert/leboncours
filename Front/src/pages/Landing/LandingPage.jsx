@@ -1,64 +1,17 @@
-import React, { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
-  Search,
-  CalendarCheck,
-  Video,
   Star,
-  Users,
-  BookOpen,
-  Clock,
   Shield,
   Zap,
   ChevronRight,
   Euro,
 } from 'lucide-react';
-import {
-  MdSchool,
-  MdMusicNote,
-  MdCode,
-  MdBrush,
-  MdScience,
-  MdCalculate,
-  MdTranslate,
-  MdFitnessCenter,
-} from 'react-icons/md';
 import { GoRocket, GoVerified } from 'react-icons/go';
 import { SkeletonCard } from '../../components/SkeletonLoader/SkeletonLoader';
 import { apiListCourses } from '../../api';
-
-
-/* ===== Category Data ===== */
-const CATEGORIES = [
-  { name: 'Programming', icon: MdCode, color: '#3B82F6', count: 234 },
-  { name: 'Music', icon: MdMusicNote, color: '#8B5CF6', count: 187 },
-  { name: 'Languages', icon: MdTranslate, color: '#10B981', count: 312 },
-  { name: 'Mathematics', icon: MdCalculate, color: '#F59E0B', count: 156 },
-  { name: 'Science', icon: MdScience, color: '#EF4444', count: 98 },
-  { name: 'Art & Design', icon: MdBrush, color: '#EC4899', count: 145 },
-  { name: 'Academics', icon: MdSchool, color: '#6366F1', count: 203 },
-  { name: 'Fitness', icon: MdFitnessCenter, color: '#14B8A6', count: 76 },
-];
-
-/* ===== Step Data ===== */
-const STEPS = [
-  {
-    icon: Search,
-    title: 'Find your mentor',
-    desc: 'Browse through skill cards and find the perfect mentor for your needs.',
-  },
-  {
-    icon: CalendarCheck,
-    title: 'Book a session',
-    desc: 'Pick a time that suits you from your mentor\'s available slots.',
-  },
-  {
-    icon: Video,
-    title: 'Learn & grow',
-    desc: 'Join a one-on-one video call and gain practical knowledge instantly.',
-  },
-];
+import { CATEGORIES, STEPS } from '../../helpers/landingData';
 
 /* ===== Sub-Components ===== */
 const CategoryCard = memo(function CategoryCard({ name, icon: Icon, color, count }) {
@@ -82,16 +35,6 @@ const StepCard = memo(function StepCard({ icon: Icon, title, desc, index }) {
       </div>
       <h3 className="step-title">{title}</h3>
       <p className="step-desc">{desc}</p>
-    </div>
-  );
-});
-
-const StatItem = memo(function StatItem({ icon: Icon, value, label }) {
-  return (
-    <div className="stat-item">
-      <Icon size={24} className="stat-icon" />
-      <span className="stat-value">{value}</span>
-      <span className="stat-label">{label}</span>
     </div>
   );
 });
@@ -218,9 +161,6 @@ export default function LandingPage() {
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Browse by category</h2>
-            <button className="section-link">
-              See all <ChevronRight size={16} />
-            </button>
           </div>
           <div className="categories-grid">
             {CATEGORIES.map((cat) => (

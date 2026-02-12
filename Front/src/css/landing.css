@@ -35,7 +35,6 @@
   border: 1px solid var(--color-primary-border);
   border-radius: var(--radius-full);
   letter-spacing: 0.3px;
-  animation: badgePulse 3s ease-in-out infinite;
 }
 
 .hero-badge svg {

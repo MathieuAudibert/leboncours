@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   Mail,
@@ -6,8 +6,6 @@ import {
   Calendar,
   Clock,
   Edit3,
-  Settings,
-  ChevronRight,
 } from 'lucide-react';
 import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
@@ -38,7 +36,6 @@ const ProfilePage = memo(function ProfilePage() {
 
     async function fetchData() {
       try {
-        /* Fetch all courses + all users for name resolution */
         const [coursesRes, usersRes] = await Promise.all([
           apiListCourses({ per_page: 100 }),
           apiListUsers({ per_page: 100 }, token).catch(() => ({ data: [] })),
@@ -186,12 +183,6 @@ const ProfilePage = memo(function ProfilePage() {
               </div>
             </div>
 
-            {/* Settings link */}
-            <button className="profile-settings-btn">
-              <Settings size={16} />
-              <span>Account Settings</span>
-              <ChevronRight size={16} className="profile-settings-chevron" />
-            </button>
           </aside>
 
           {/* ── Main content ── */}

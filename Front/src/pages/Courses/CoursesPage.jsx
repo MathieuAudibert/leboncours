@@ -7,7 +7,6 @@ import {
   BookOpen,
   Search,
   SlidersHorizontal,
-  Download,
   RotateCcw,
   Info,
   X,
@@ -22,7 +21,6 @@ import {
   GraduationCap,
   Tag,
 } from 'lucide-react';
-import { MdFilterListOff } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
 import {
   apiListCourses,
@@ -497,21 +495,6 @@ const CoursesPage = memo(function CoursesPage() {
     setQuickFilter(e.target.value);
   }, []);
 
-  const handleResetFilters = useCallback(() => {
-    if (gridRef.current?.api) {
-      gridRef.current.api.setFilterModel(null);
-      setQuickFilter('');
-    }
-  }, []);
-
-  const handleExportCsv = useCallback(() => {
-    if (gridRef.current?.api) {
-      gridRef.current.api.exportDataAsCsv({
-        fileName: 'leboncours-courses.csv',
-      });
-    }
-  }, []);
-
   const toggleFilters = useCallback(() => {
     setShowFilters(prev => !prev);
   }, []);
@@ -548,14 +531,6 @@ const CoursesPage = memo(function CoursesPage() {
               <span className="courses-stat-chip-value">{stats.total}</span>
               <span className="courses-stat-chip-label">Courses</span>
             </div>
-            <div className="courses-stat-chip">
-              <span className="courses-stat-chip-value">€{stats.avgPrice}</span>
-              <span className="courses-stat-chip-label">Avg. price</span>
-            </div>
-            <div className="courses-stat-chip">
-              <span className="courses-stat-chip-value">{stats.levels}</span>
-              <span className="courses-stat-chip-label">Levels</span>
-            </div>
           </div>
         </div>
 
@@ -590,22 +565,6 @@ const CoursesPage = memo(function CoursesPage() {
             >
               <SlidersHorizontal size={16} />
               <span>Filters</span>
-            </button>
-            <button
-              className="courses-toolbar-btn"
-              onClick={handleResetFilters}
-              title="Reset all filters"
-            >
-              <MdFilterListOff size={16} />
-              <span>Reset</span>
-            </button>
-            <button
-              className="courses-toolbar-btn"
-              onClick={handleExportCsv}
-              title="Export as CSV"
-            >
-              <Download size={16} />
-              <span>Export</span>
             </button>
           </div>
         </div>
