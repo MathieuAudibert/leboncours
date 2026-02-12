@@ -36,9 +36,6 @@ import {
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-/* ═══════════════════════════════════════
-   CUSTOM CELL RENDERERS
-   ═══════════════════════════════════════ */
 function SubjectRenderer({ data }) {
   return (
     <span className="courses-subject-row">
@@ -78,9 +75,6 @@ function DescriptionRenderer({ value }) {
   return <span className="courses-description">{value || '—'}</span>;
 }
 
-/* ═══════════════════════════════════════
-   CREATE COURSE MODAL (Teachers only)
-   ═══════════════════════════════════════ */
 function CreateCourseModal({ onClose, onCreated }) {
   const [subject, setSubject] = useState('');
   const [hourlyPrice, setHourlyPrice] = useState('');
@@ -235,9 +229,6 @@ function CreateCourseModal({ onClose, onCreated }) {
   );
 }
 
-/* ═══════════════════════════════════════
-   BOOKING MODAL
-   ═══════════════════════════════════════ */
 function BookingModal({ course, onClose, onBooked }) {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -363,9 +354,6 @@ function BookingModal({ course, onClose, onBooked }) {
   );
 }
 
-/* ═══════════════════════════════════════
-   MAIN COMPONENT
-   ═══════════════════════════════════════ */
 const CoursesPage = memo(function CoursesPage() {
   const { user, token } = useAuth();
   const isTeacher = user?.role === 'Teacher';

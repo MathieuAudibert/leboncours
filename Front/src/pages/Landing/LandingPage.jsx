@@ -139,14 +139,6 @@ export default function LandingPage() {
     return () => { cancelled = true; };
   }, []);
 
-  /* Derive live stats from fetched data */
-  const dynamicStats = [
-    { icon: Users, value: '10k+', label: 'Active Users' },
-    { icon: BookOpen, value: courses.length > 0 ? `${courses.length}+` : '—', label: 'Courses Available' },
-    { icon: Star, value: '4.9', label: 'Average Rating' },
-    { icon: Clock, value: '50k+', label: 'Hours of Tutoring' },
-  ];
-
   return (
     <div className="landing">
       {/* ── Hero ── */}
@@ -281,37 +273,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Stats ── */}
-      <section className="section stats-section">
-        <div className="container">
-          <div className="stats-grid glass-panel">
-            {dynamicStats.map((s) => (
-              <StatItem key={s.label} {...s} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="section cta-section">
-        <div className="container">
-          <div className="cta-card">
-            <h2 className="cta-title">Ready to start learning?</h2>
-            <p className="cta-subtitle">
-              Join thousands of learners and mentors on the fastest growing tutoring marketplace.
-            </p>
-            <div className="cta-actions">
-              <button className="btn btn--primary btn--lg">
-                Sign up free
-                <ArrowRight size={18} />
-              </button>
-              <button className="btn btn--outline btn--lg">
-                Become a Mentor
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

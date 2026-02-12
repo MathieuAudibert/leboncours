@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { apiLogin, apiRegister } from '../api';
 
-/* ═══════════════════════════════════════
-   CONTEXT
-   ═══════════════════════════════════════ */
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {

@@ -1,7 +1,3 @@
-/* ═══════════════════════════════════════
-   API HELPER — single place for all backend calls
-   ═══════════════════════════════════════ */
-
 const API_BASE = process.env.REACT_APP_API_URL || 'http://127.0.0.1:3001';
 
 /* ── Generic fetch wrapper ── */
@@ -30,9 +26,6 @@ async function request(endpoint, { method = 'GET', body, token } = {}) {
     return data;
 }
 
-/* ═══════════════════════════════════════
-   AUTH
-   ═══════════════════════════════════════ */
 export async function apiLogin(email, password) {
     return request('/api/auth/login', {
         method: 'POST',
@@ -47,9 +40,6 @@ export async function apiRegister({ name, firstname, email, role, password }) {
     });
 }
 
-/* ═══════════════════════════════════════
-   COURSES
-   ═══════════════════════════════════════ */
 export async function apiListCourses(params = {}) {
     const query = new URLSearchParams();
     if (params.page) query.set('page', params.page);
@@ -89,9 +79,6 @@ export async function apiDeleteCourse(id, token) {
     });
 }
 
-/* ═══════════════════════════════════════
-   USERS
-   ═══════════════════════════════════════ */
 export async function apiGetUser(id, token) {
     return request(`/api/users/${id}`, { token });
 }
@@ -107,9 +94,6 @@ export async function apiListUsers(params = {}, token) {
     return request(`/api/users/all${qs ? `?${qs}` : ''}`, { token });
 }
 
-/* ═══════════════════════════════════════
-   TEACHER-COURSES
-   ═══════════════════════════════════════ */
 export async function apiListTeacherCourses(params = {}, token) {
     const query = new URLSearchParams();
     if (params.teacher_id) query.set('teacher_id', params.teacher_id);
@@ -124,9 +108,6 @@ export async function apiCreateTeacherCourse(data, token) {
     return request('/api/teacher-courses/create', { method: 'POST', body: data, token });
 }
 
-/* ═══════════════════════════════════════
-   EVENT-COURSES (sessions)
-   ═══════════════════════════════════════ */
 export async function apiListEventCourses(params = {}, token) {
     const query = new URLSearchParams();
     if (params.student_id) query.set('student_id', params.student_id);
@@ -142,9 +123,6 @@ export async function apiCreateEventCourse(data, token) {
     return request('/api/event-courses/create', { method: 'POST', body: data, token });
 }
 
-/* ═══════════════════════════════════════
-   AVAILABILITIES
-   ═══════════════════════════════════════ */
 export async function apiListAvailabilities(params = {}, token) {
     const query = new URLSearchParams();
     if (params.course_id) query.set('course_id', params.course_id);
@@ -154,9 +132,6 @@ export async function apiListAvailabilities(params = {}, token) {
     return request(`/api/availabilities/all${qs ? `?${qs}` : ''}`, { token });
 }
 
-/* ═══════════════════════════════════════
-   MESSAGES
-   ═══════════════════════════════════════ */
 export async function apiListMessages(params = {}, token) {
     const query = new URLSearchParams();
     if (params.page) query.set('page', params.page);
@@ -169,9 +144,6 @@ export async function apiGetMessage(id, token) {
     return request(`/api/messages/${id}`, { token });
 }
 
-/* ═══════════════════════════════════════
-   MESSAGE-USERS
-   ═══════════════════════════════════════ */
 export async function apiListMessageUsers(params = {}, token) {
     const query = new URLSearchParams();
     if (params.sender_id) query.set('sender_id', params.sender_id);

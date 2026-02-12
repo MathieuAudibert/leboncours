@@ -18,9 +18,12 @@ import {
   apiListUsers,
 } from '../../api';
 
-/* ═══════════════════════════════════════
-   PROFILE PAGE — all data from the backend
-   ═══════════════════════════════════════ */
+const EmptyState = ({ loading, label }) => (
+  <p style={{ color: '#9CA3AF', padding: '1rem 0' }}>
+    {loading ? `Loading ${label}...` : `No ${label} yet.`}
+  </p>
+);
+
 const ProfilePage = memo(function ProfilePage() {
   const { user, token } = useAuth();
   const [courses, setCourses] = useState([]);
@@ -193,11 +196,6 @@ const ProfilePage = memo(function ProfilePage() {
 
           {/* ── Main content ── */}
           <div className="profile-main">
-            {loading ? (
-              <div className="profile-card">
-                <p style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>Loading data from the database...</p>
-              </div>
-            ) : (
               <>
                 {/* Courses */}
                 <div className="profile-card">
@@ -207,7 +205,7 @@ const ProfilePage = memo(function ProfilePage() {
                   </h3>
                   <div className="profile-courses-list">
                     {courses.length === 0 ? (
-                      <p style={{ color: '#9CA3AF', padding: '1rem 0' }}>No courses yet.</p>
+                      <EmptyState loading={loading} label="courses" />
                     ) : courses.map((c) => (
                       <div className="profile-course-row" key={c.id}>
                         <div className="profile-course-icon profile-course-icon--filled">
@@ -233,7 +231,7 @@ const ProfilePage = memo(function ProfilePage() {
                   </h3>
                   <div className="profile-sessions-list">
                     {sessions.length === 0 ? (
-                      <p style={{ color: '#9CA3AF', padding: '1rem 0' }}>No sessions yet.</p>
+                      <EmptyState loading={loading} label="sessions" />
                     ) : sessions.map((s) => {
                       const d = s.dates ? new Date(s.dates) : null;
                       return (
@@ -260,7 +258,6 @@ const ProfilePage = memo(function ProfilePage() {
                   </div>
                 </div>
               </>
-            )}
           </div>
         </div>
       </div>

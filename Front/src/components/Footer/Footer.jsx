@@ -65,19 +65,8 @@ const Footer = memo(function Footer() {
 
         <div className="footer-bottom">
           <p className="footer-copy">
-            © {currentYear} Leboncours. Made with <Heart size={14} className="footer-heart" /> for learners everywhere.
+            © {currentYear} Leboncours
           </p>
-          <div className="footer-socials">
-            <a href="https://github.com/MathieuAudibert/leboncours" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="GitHub">
-              <FaGithub size={20} />
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Twitter">
-              <FaTwitter size={20} />
-            </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="LinkedIn">
-              <FaLinkedin size={20} />
-            </a>
-          </div>
         </div>
       </div>
     </footer>

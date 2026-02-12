@@ -1,19 +1,18 @@
 import React, { memo, useMemo } from 'react';
 import {
-    BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+    BarChart, Bar, PieChart, Pie, Cell,
     AreaChart, Area,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { BarChart3, TrendingUp, PieChart as PieChartIcon, Activity } from 'lucide-react';
+import {
+    COLORS,
+    buildSessionsPerDay,
+    buildCourseDistribution,
+    buildSessionsByState,
+    buildSessionsOverTime,
+} from '../../helpers/chartHelpers';
 
-/* ═══════════════════════════════════════
-   CHART COLOUR PALETTE
-   ═══════════════════════════════════════ */
-const COLORS = ['#2d5a8c', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
-
-/* ═══════════════════════════════════════
-   CUSTOM TOOLTIP
-   ═══════════════════════════════════════ */
 function ChartTooltip({ active, payload, label }) {
     if (!active || !payload?.length) return null;
     return (
@@ -30,52 +29,6 @@ function ChartTooltip({ active, payload, label }) {
     );
 }
 
-/* ═══════════════════════════════════════
-   HELPERS — derive chart data from real props
-   ═══════════════════════════════════════ */
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-function buildSessionsPerDay(sessions) {
-    const counts = DAYS.map(() => 0);
-    (sessions || []).forEach((s) => {
-        if (!s.dates) return;
-        const d = new Date(s.dates);
-        const dow = (d.getDay() + 6) % 7; // Mon=0
-        counts[dow]++;
-    });
-    return DAYS.map((day, i) => ({ day, sessions: counts[i] }));
-}
-
-function buildCourseDistribution(courses) {
-    if (!courses || courses.length === 0) return [{ name: 'No courses', value: 1 }];
-    return courses.map((c) => ({ name: c.subject || 'Unknown', value: 1 }));
-}
-
-function buildSessionsByState(sessions) {
-    const stateMap = {};
-    (sessions || []).forEach((s) => {
-        const st = s.state || 'Unknown';
-        stateMap[st] = (stateMap[st] || 0) + 1;
-    });
-    const result = Object.entries(stateMap).map(([name, value]) => ({ name, value }));
-    return result.length > 0 ? result : [{ name: 'No sessions', value: 1 }];
-}
-
-function buildSessionsOverTime(sessions) {
-    const months = {};
-    (sessions || []).forEach((s) => {
-        if (!s.dates) return;
-        const d = new Date(s.dates);
-        const key = d.toLocaleString('en', { month: 'short', year: '2-digit' });
-        months[key] = (months[key] || 0) + 1;
-    });
-    const entries = Object.entries(months).map(([month, count]) => ({ month, sessions: count }));
-    return entries.length > 0 ? entries : [{ month: 'N/A', sessions: 0 }];
-}
-
-/* ═══════════════════════════════════════
-   MAIN COMPONENT — powered by real data
-   ═══════════════════════════════════════ */
 const DashboardCharts = memo(function DashboardCharts({ isTeacher, sessions, courses }) {
     const charts = useMemo(() => {
         const sessionsPerDay = buildSessionsPerDay(sessions);
