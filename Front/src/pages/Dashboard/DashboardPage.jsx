@@ -185,38 +185,6 @@ const DashboardPage = memo(function DashboardPage() {
               )}
             </div>
           </div>
-          <aside>
-            {/* Quick Calendar */}
-            <div className="dash-card">
-              <div className="dash-card-header">
-                <h2 className="dash-card-title">
-                  <Clock size={18} />
-                  This Week
-                </h2>
-              </div>
-              <div className="dash-week-grid">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
-                  const now = new Date();
-                  const mondayOffset = (now.getDay() + 6) % 7;
-                  const monday = new Date(now);
-                  monday.setDate(now.getDate() - mondayOffset);
-                  const targetDate = new Date(monday);
-                  targetDate.setDate(monday.getDate() + i);
-                  const hasSessions = upcomingSessions.some((s) => {
-                    if (!s.dates) return false;
-                    const sd = new Date(s.dates);
-                    return sd.toDateString() === targetDate.toDateString();
-                  });
-                  return (
-                    <div className={`dash-week-day ${hasSessions ? 'dash-week-day--active' : ''}`} key={day}>
-                      <span className="dash-week-label">{day}</span>
-                      {hasSessions && <span className="dash-week-dot" />}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </aside>
         </div>
       </div>
     </div>
