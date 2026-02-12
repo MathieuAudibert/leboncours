@@ -455,6 +455,115 @@
   line-height: 1.6;
 }
 
+/* ── Edit Profile Modal ── */
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.profile-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.profile-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.profile-modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.profile-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.profile-modal-close:hover {
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.profile-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profile-modal-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.profile-modal-input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-background);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.profile-modal-input:focus {
+  border-color: var(--color-primary);
+}
+
+.profile-modal-error {
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.profile-modal-submit {
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  margin-top: 4px;
+}
+
+.profile-modal-submit:hover {
+  opacity: 0.9;
+}
+
+.profile-modal-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ═══════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════ */

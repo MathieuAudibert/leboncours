@@ -22,20 +22,22 @@ const LoginPage = memo(function LoginPage() {
     setForm(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    // Small delay to show spinner
-    setTimeout(() => {
-      const result = login(form.email, form.password);
-      setLoading(false);
+    try {
+      const result = await login(form.email, form.password);
       if (result.success) {
         navigate('/dashboard');
       } else {
         setError(result.error);
       }
-    }, 600);
+    } catch {
+      setError('Something went wrong. Is the backend running?');
+    } finally {
+      setLoading(false);
+    }
   }, [form, login, navigate]);
 
   return (
@@ -54,9 +56,7 @@ const LoginPage = memo(function LoginPage() {
               <p className="auth-subtitle">
                 Log in to your account to access your courses and messages.
               </p>
-              <p className="auth-hint">
-                Demo: <strong>caca1 / caca1</strong> (Student) or <strong>caca2 / caca2</strong> (Teacher)
-              </p>
+
             </div>
 
             {/* Social login */}
@@ -79,19 +79,19 @@ const LoginPage = memo(function LoginPage() {
             <form className="auth-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label" htmlFor="login-email">
-                  Username
+                  Email address
                 </label>
                 <div className="form-input-wrap">
                   <Mail size={18} className="form-input-icon" />
                   <input
                     id="login-email"
                     name="email"
-                    type="text"
-                    placeholder="caca1 or caca2"
+                    type="email"
+                    placeholder="you@example.com"
                     className="form-input"
                     value={form.email}
                     onChange={handleChange}
-                    autoComplete="username"
+                    autoComplete="email"
                     required
                   />
                 </div>

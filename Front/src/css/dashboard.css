@@ -548,6 +548,107 @@
 }
 
 /* ═══════════════════════════════════
+   DASHBOARD CHARTS
+   ═══════════════════════════════════ */
+
+.dash-charts {
+  margin-bottom: 32px;
+}
+
+.dash-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.dash-chart-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 20px 20px 12px;
+  transition: all var(--transition-fast);
+}
+
+.dash-chart-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.dash-chart-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--color-primary);
+}
+
+.dash-chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.dash-chart-body {
+  width: 100%;
+  min-height: 220px;
+}
+
+/* Chart tooltip */
+.chart-tooltip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  box-shadow: var(--shadow-md);
+}
+
+.chart-tooltip-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.chart-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.chart-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chart-tooltip-name {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.chart-tooltip-value {
+  font-weight: 700;
+  color: var(--color-text);
+  margin-left: auto;
+}
+
+/* Recharts overrides */
+.dash-chart-body .recharts-cartesian-grid-horizontal line,
+.dash-chart-body .recharts-cartesian-grid-vertical line {
+  stroke: var(--color-border-light);
+}
+
+.dash-chart-body .recharts-legend-item-text {
+  font-family: var(--font-family) !important;
+  font-size: 12px !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* ═══════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════ */
 
@@ -558,6 +659,10 @@
 
   .dash-stats-row {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dash-charts-grid {
+    grid-template-columns: 1fr;
   }
 }
 

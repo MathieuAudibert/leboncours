@@ -1,70 +1,17 @@
-import React, { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
-  Search,
-  CalendarCheck,
-  Video,
   Star,
-  Users,
-  BookOpen,
-  Clock,
   Shield,
   Zap,
   ChevronRight,
+  Euro,
 } from 'lucide-react';
-import {
-  MdSchool,
-  MdMusicNote,
-  MdCode,
-  MdBrush,
-  MdScience,
-  MdCalculate,
-  MdTranslate,
-  MdFitnessCenter,
-} from 'react-icons/md';
 import { GoRocket, GoVerified } from 'react-icons/go';
 import { SkeletonCard } from '../../components/SkeletonLoader/SkeletonLoader';
-
-
-/* ===== Category Data ===== */
-const CATEGORIES = [
-  { name: 'Programming', icon: MdCode, color: '#3B82F6', count: 234 },
-  { name: 'Music', icon: MdMusicNote, color: '#8B5CF6', count: 187 },
-  { name: 'Languages', icon: MdTranslate, color: '#10B981', count: 312 },
-  { name: 'Mathematics', icon: MdCalculate, color: '#F59E0B', count: 156 },
-  { name: 'Science', icon: MdScience, color: '#EF4444', count: 98 },
-  { name: 'Art & Design', icon: MdBrush, color: '#EC4899', count: 145 },
-  { name: 'Academics', icon: MdSchool, color: '#6366F1', count: 203 },
-  { name: 'Fitness', icon: MdFitnessCenter, color: '#14B8A6', count: 76 },
-];
-
-/* ===== Step Data ===== */
-const STEPS = [
-  {
-    icon: Search,
-    title: 'Find your mentor',
-    desc: 'Browse through skill cards and find the perfect mentor for your needs.',
-  },
-  {
-    icon: CalendarCheck,
-    title: 'Book a session',
-    desc: 'Pick a time that suits you from your mentor\'s available slots.',
-  },
-  {
-    icon: Video,
-    title: 'Learn & grow',
-    desc: 'Join a one-on-one video call and gain practical knowledge instantly.',
-  },
-];
-
-/* ===== Stats Data ===== */
-const STATS = [
-  { icon: Users, value: '10k+', label: 'Active Users' },
-  { icon: BookOpen, value: '2.5k+', label: 'Courses Available' },
-  { icon: Star, value: '4.9', label: 'Average Rating' },
-  { icon: Clock, value: '50k+', label: 'Hours of Tutoring' },
-];
+import { apiListCourses } from '../../api';
+import { CATEGORIES, STEPS } from '../../helpers/landingData';
 
 /* ===== Sub-Components ===== */
 const CategoryCard = memo(function CategoryCard({ name, icon: Icon, color, count }) {
@@ -92,18 +39,49 @@ const StepCard = memo(function StepCard({ icon: Icon, title, desc, index }) {
   );
 });
 
-const StatItem = memo(function StatItem({ icon: Icon, value, label }) {
+/* ===== Featured Course Card ===== */
+const FeaturedCourseCard = memo(function FeaturedCourseCard({ course }) {
+  const levelClass = course.level
+    ? `courses-level courses-level--${course.level.toLowerCase()}`
+    : 'courses-level';
   return (
-    <div className="stat-item">
-      <Icon size={24} className="stat-icon" />
-      <span className="stat-value">{value}</span>
-      <span className="stat-label">{label}</span>
-    </div>
+    <Link to="/courses" className="featured-course-card card-hover">
+      <div className="featured-course-top">
+        <span className={levelClass}>{course.level || 'All levels'}</span>
+      </div>
+      <h4 className="featured-course-subject">{course.subject}</h4>
+      <p className="featured-course-desc">
+        {course.description || 'No description available.'}
+      </p>
+      <div className="featured-course-footer">
+        <span className="featured-course-price">
+          <Euro size={14} /> €{course.hourly_price}/hr
+        </span>
+      </div>
+    </Link>
   );
 });
 
 /* ===== Landing Page ===== */
 export default function LandingPage() {
+  const [courses, setCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiListCourses({ per_page: 4 })
+      .then((res) => {
+        if (!cancelled) setCourses(res.data || []);
+      })
+      .catch(() => {
+        if (!cancelled) setCourses([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingCourses(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
   return (
     <div className="landing">
       {/* ── Hero ── */}
@@ -183,9 +161,6 @@ export default function LandingPage() {
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Browse by category</h2>
-            <button className="section-link">
-              See all <ChevronRight size={16} />
-            </button>
           </div>
           <div className="categories-grid">
             {CATEGORIES.map((cat) => (
@@ -212,58 +187,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Featured (Skeleton) ── */}
+      {/* ── Featured Courses ── */}
       <section className="section featured-section">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Featured courses</h2>
-            <button className="section-link">
+            <Link to="/courses" className="section-link">
               Browse all <ChevronRight size={16} />
-            </button>
+            </Link>
           </div>
           <div className="featured-grid">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
+            {loadingCourses
+              ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+              : courses.length > 0
+                ? courses.map((c) => <FeaturedCourseCard key={c.id} course={c} />)
+                : Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            }
           </div>
-          <p className="featured-note">
-            <Zap size={14} />
-            Course listings will appear once the backend is connected.
-          </p>
-        </div>
-      </section>
-
-      {/* ── Stats ── */}
-      <section className="section stats-section">
-        <div className="container">
-          <div className="stats-grid glass-panel">
-            {STATS.map((s) => (
-              <StatItem key={s.label} {...s} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="section cta-section">
-        <div className="container">
-          <div className="cta-card">
-            <h2 className="cta-title">Ready to start learning?</h2>
-            <p className="cta-subtitle">
-              Join thousands of learners and mentors on the fastest growing tutoring marketplace.
+          {!loadingCourses && courses.length === 0 && (
+            <p className="featured-note">
+              <Zap size={14} />
+              Could not load courses — make sure the backend is running on port 3001.
             </p>
-            <div className="cta-actions">
-              <button className="btn btn--primary btn--lg">
-                Sign up free
-                <ArrowRight size={18} />
-              </button>
-              <button className="btn btn--outline btn--lg">
-                Become a Mentor
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </section>
+
     </div>
   );
 }
