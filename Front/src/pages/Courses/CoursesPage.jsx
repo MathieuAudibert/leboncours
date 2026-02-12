@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -20,6 +20,7 @@ import {
   Plus,
   FileText,
   GraduationCap,
+  Tag,
 } from 'lucide-react';
 import { MdFilterListOff } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
