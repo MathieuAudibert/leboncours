@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
   BookOpen,
@@ -18,46 +18,15 @@ import {
 import { MdSchool } from 'react-icons/md';
 import { GoVerified } from 'react-icons/go';
 import { useAuth } from '../../context/AuthContext';
-
-/* ═══════════════════════════════════════
-   MOCK DATA — would come from backend
-   ═══════════════════════════════════════ */
-
-/* Simulated user — change role to 'Teacher' to preview teacher dashboard */
-/* (Now uses AuthContext — MOCK_USER kept as fallback) */
-
-const UPCOMING_SESSIONS_STUDENT = [
-  { id: 1, subject: 'React & TypeScript', teacher: 'Lucas B.', date: '2026-02-12', time: '10:00', state: 'Confirmed', level: 'Intermediate' },
-  { id: 2, subject: 'French for Beginners', teacher: 'Pierre D.', date: '2026-02-14', time: '14:30', state: 'Pending', level: 'Beginner' },
-  { id: 3, subject: 'Calculus I & II', teacher: 'Marie C.', date: '2026-02-16', time: '09:00', state: 'Confirmed', level: 'Intermediate' },
-];
-
-const UPCOMING_SESSIONS_TEACHER = [
-  { id: 1, subject: 'React & TypeScript', student: 'Emma L.', date: '2026-02-12', time: '10:00', state: 'Confirmed', level: 'Intermediate' },
-  { id: 2, subject: 'React & TypeScript', student: 'Thomas R.', date: '2026-02-13', time: '15:00', state: 'Pending', level: 'Intermediate' },
-  { id: 3, subject: 'Algorithms & Data Structures', student: 'Sarah K.', date: '2026-02-15', time: '11:30', state: 'Confirmed', level: 'Advanced' },
-];
-
-const ENROLLED_COURSES = [
-  { id: 1, subject: 'React & TypeScript', teacher: 'Lucas B.', hourly_price: 50, progress: 60, rating: 4.9 },
-  { id: 2, subject: 'French for Beginners', teacher: 'Pierre D.', hourly_price: 20, progress: 25, rating: 4.8 },
-  { id: 3, subject: 'Calculus I & II', teacher: 'Marie C.', hourly_price: 35, progress: 10, rating: 4.6 },
-];
-
-const TEACHING_COURSES = [
-  { id: 1, subject: 'React & TypeScript', students: 156, hourly_price: 50, rating: 4.9, sessions_this_week: 8 },
-  { id: 2, subject: 'Algorithms & Data Structures', students: 143, hourly_price: 48, rating: 4.9, sessions_this_week: 5 },
-];
-
-const RECENT_MESSAGES = [
-  { id: 1, sender: 'Lucas B.', preview: 'See you tomorrow for the TS session!', time: '2h ago' },
-  { id: 2, sender: 'Pierre D.', preview: 'I sent you the materials for next class.', time: '5h ago' },
-];
-
-const NOTIFICATIONS = [
-  { id: 1, text: 'Your session with Lucas B. is in 2 days.', type: 'reminder' },
-  { id: 2, text: 'Pierre D. confirmed your booking.', type: 'success' },
-];
+import DashboardCharts from '../../components/DashboardCharts/DashboardCharts';
+import {
+  apiListCourses,
+  apiListTeacherCourses,
+  apiListEventCourses,
+  apiListUsers,
+  apiListMessageUsers,
+  apiGetMessage,
+} from '../../api';
 
 /* ═══════════════════════════════════════
    SUB-COMPONENTS
@@ -65,36 +34,172 @@ const NOTIFICATIONS = [
 const StateTag = memo(function StateTag({ state }) {
   const cls = state === 'Confirmed' ? 'dash-state--confirmed' :
     state === 'Pending' ? 'dash-state--pending' :
-    state === 'Canceled' ? 'dash-state--canceled' : '';
+      state === 'Canceled' ? 'dash-state--canceled' : '';
   return <span className={`dash-state ${cls}`}>{state}</span>;
 });
 
 /* ═══════════════════════════════════════
-   DASHBOARD PAGE
+   DASHBOARD PAGE — all data from backend
    ═══════════════════════════════════════ */
 const DashboardPage = memo(function DashboardPage() {
-  const { user } = useAuth();
-
+  const { user, token } = useAuth();
   const isTeacher = user?.role === 'Teacher';
 
-  const upcomingSessions = isTeacher ? UPCOMING_SESSIONS_TEACHER : UPCOMING_SESSIONS_STUDENT;
+  const [upcomingSessions, setUpcomingSessions] = useState([]);
+  const [myCourses, setMyCourses] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    async function fetchAll() {
+      try {
+        const [coursesRes, usersRes, tcRes, evRes] = await Promise.all([
+          apiListCourses({ per_page: 100 }),
+          apiListUsers({ per_page: 100 }, token).catch(() => ({ data: [] })),
+          apiListTeacherCourses({ per_page: 100 }, token).catch(() => ({ data: [] })),
+          apiListEventCourses({ per_page: 100 }, token).catch(() => ({ data: [] })),
+        ]);
+
+        if (cancelled) return;
+
+        const courseMap = {};
+        (coursesRes.data || []).forEach((c) => { courseMap[c.id] = c; });
+        const userMap = {};
+        (usersRes.data || []).forEach((u) => { userMap[u.id] = u; });
+        const courseTeacherMap = {};
+        (tcRes.data || []).forEach((tc) => {
+          if (tc.course_id && tc.teacher_id) {
+            courseTeacherMap[tc.course_id] = tc.teacher_id;
+          }
+        });
+
+        /* Build sessions */
+        const allEvents = evRes.data || [];
+        let sessionsList;
+        if (isTeacher) {
+          const myTcIds = (tcRes.data || [])
+            .filter((tc) => tc.teacher_id === user.id)
+            .map((tc) => tc.course_id);
+          sessionsList = allEvents
+            .filter((ev) => myTcIds.includes(ev.course_id))
+            .map((ev) => {
+              const student = userMap[ev.student_id];
+              return {
+                ...ev,
+                subject: courseMap[ev.course_id]?.subject || 'Unknown',
+                level: courseMap[ev.course_id]?.level || null,
+                personName: student ? `${student.firstname} ${student.name}` : 'Student',
+                personLabel: 'Student',
+              };
+            });
+          /* Teacher courses */
+          const teacherCourseIds = myTcIds;
+          const tc = teacherCourseIds.map((cid) => courseMap[cid]).filter(Boolean);
+          if (!cancelled) setMyCourses(tc);
+        } else {
+          sessionsList = allEvents
+            .filter((ev) => ev.student_id === user.id)
+            .map((ev) => {
+              const tid = courseTeacherMap[ev.course_id];
+              const teacher = tid ? userMap[tid] : null;
+              return {
+                ...ev,
+                subject: courseMap[ev.course_id]?.subject || 'Unknown',
+                level: courseMap[ev.course_id]?.level || null,
+                personName: teacher ? `${teacher.firstname} ${teacher.name}` : 'Teacher',
+                personLabel: 'Teacher',
+              };
+            });
+          /* Student enrolled courses */
+          const enrolledIds = [...new Set(sessionsList.map((s) => s.course_id).filter(Boolean))];
+          const enrolled = enrolledIds.map((cid) => {
+            const teacher_id = courseTeacherMap[cid];
+            const teacher = teacher_id ? userMap[teacher_id] : null;
+            return {
+              ...courseMap[cid],
+              teacher: teacher ? `${teacher.firstname} ${teacher.name}` : null,
+            };
+          }).filter((c) => c.id);
+          if (!cancelled) setMyCourses(enrolled);
+        }
+
+        if (!cancelled) setUpcomingSessions(sessionsList);
+
+        /* Notifications derived from sessions */
+        const notifs = sessionsList.slice(0, 3).map((s) => ({
+          id: s.id,
+          text: s.state === 'Confirmed'
+            ? `Session "${s.subject}" with ${s.personName} is confirmed.`
+            : s.state === 'Pending'
+              ? `Session "${s.subject}" with ${s.personName} is pending.`
+              : `Session "${s.subject}" status: ${s.state}`,
+          type: s.state === 'Confirmed' ? 'success' : 'reminder',
+        }));
+        if (!cancelled) setNotifications(notifs);
+
+        /* Fetch messages where user is sender or receiver */
+        const [sentRes, recvRes] = await Promise.all([
+          apiListMessageUsers({ sender_id: user.id, per_page: 5 }, token).catch(() => ({ data: [] })),
+          apiListMessageUsers({ receiver_id: user.id, per_page: 5 }, token).catch(() => ({ data: [] })),
+        ]);
+        const allMu = [...(sentRes.data || []), ...(recvRes.data || [])];
+        /* Deduplicate by message_id, keep latest */
+        const seen = new Set();
+        const uniqueMu = allMu.filter((mu) => {
+          if (seen.has(mu.message_id)) return false;
+          seen.add(mu.message_id);
+          return true;
+        }).slice(0, 5);
+
+        /* Resolve message content + sender name */
+        const msgPromises = uniqueMu.map(async (mu) => {
+          try {
+            const msg = await apiGetMessage(mu.message_id, token);
+            const other = mu.sender_id === user.id ? userMap[mu.receiver_id] : userMap[mu.sender_id];
+            return {
+              id: mu.id,
+              sender: other ? `${other.firstname} ${other.name}` : 'User',
+              preview: msg?.content || '(no content)',
+              time: msg?.created_at ? new Date(msg.created_at).toLocaleDateString() : '',
+            };
+          } catch {
+            return null;
+          }
+        });
+        const resolvedMsgs = (await Promise.all(msgPromises)).filter(Boolean);
+        if (!cancelled) setMessages(resolvedMsgs);
+
+      } catch {
+        /* silently fail */
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchAll();
+    return () => { cancelled = true; };
+  }, [user, token, isTeacher]);
 
   const stats = useMemo(() => {
     if (isTeacher) {
       return [
-        { icon: Users, value: TEACHING_COURSES.reduce((s, c) => s + c.students, 0), label: 'Total Students' },
-        { icon: Calendar, value: TEACHING_COURSES.reduce((s, c) => s + c.sessions_this_week, 0), label: 'Sessions This Week' },
-        { icon: Star, value: (TEACHING_COURSES.reduce((s, c) => s + c.rating, 0) / TEACHING_COURSES.length).toFixed(1), label: 'Avg. Rating' },
-        { icon: TrendingUp, value: `€${TEACHING_COURSES.reduce((s, c) => s + c.hourly_price * c.sessions_this_week, 0)}`, label: 'Est. This Week' },
+        { icon: BookOpen, value: myCourses.length, label: 'Courses Teaching' },
+        { icon: Calendar, value: upcomingSessions.length, label: 'Total Sessions' },
+        { icon: CheckCircle, value: upcomingSessions.filter(s => s.state === 'Confirmed').length, label: 'Confirmed' },
+        { icon: TrendingUp, value: `€${myCourses.reduce((s, c) => s + (c.hourly_price || 0), 0)}`, label: 'Total Hourly' },
       ];
     }
     return [
-      { icon: BookOpen, value: ENROLLED_COURSES.length, label: 'Enrolled Courses' },
-      { icon: Calendar, value: upcomingSessions.filter(s => s.state === 'Confirmed').length, label: 'Upcoming Sessions' },
-      { icon: Clock, value: '12h', label: 'Study Time' },
-      { icon: Star, value: '4.8', label: 'Avg. Course Rating' },
+      { icon: BookOpen, value: myCourses.length, label: 'Enrolled Courses' },
+      { icon: Calendar, value: upcomingSessions.filter(s => s.state === 'Confirmed').length, label: 'Confirmed Sessions' },
+      { icon: Clock, value: upcomingSessions.length, label: 'Total Sessions' },
+      { icon: Star, value: upcomingSessions.filter(s => s.state === 'Done').length, label: 'Completed' },
     ];
-  }, [isTeacher, upcomingSessions]);
+  }, [isTeacher, myCourses, upcomingSessions]);
 
   if (!user) return <Navigate to="/login" replace />;
 
@@ -139,6 +244,9 @@ const DashboardPage = memo(function DashboardPage() {
           ))}
         </div>
 
+        {/* ── Charts ── */}
+        <DashboardCharts isTeacher={isTeacher} sessions={upcomingSessions} courses={myCourses} />
+
         <div className="dash-grid">
           {/* ── LEFT COLUMN ── */}
           <div className="dash-main">
@@ -147,34 +255,41 @@ const DashboardPage = memo(function DashboardPage() {
               <div className="dash-card-header">
                 <h2 className="dash-card-title">
                   <Calendar size={18} />
-                  Upcoming Sessions
+                  Sessions
                 </h2>
                 <span className="dash-card-count">{upcomingSessions.length}</span>
               </div>
-              <div className="dash-sessions-list">
-                {upcomingSessions.map((session) => (
-                  <div className="dash-session-row" key={session.id}>
-                    <div className="dash-session-date-block">
-                      <span className="dash-session-day">{new Date(session.date).getDate()}</span>
-                      <span className="dash-session-month">{new Date(session.date).toLocaleString('en', { month: 'short' })}</span>
-                    </div>
-                    <div className="dash-session-info">
-                      <span className="dash-session-subject">{session.subject}</span>
-                      <span className="dash-session-meta">
-                        {isTeacher ? `Student: ${session.student}` : `Teacher: ${session.teacher}`}
-                        &nbsp;·&nbsp;{session.time}
-                        &nbsp;·&nbsp;{session.level}
-                      </span>
-                    </div>
-                    <StateTag state={session.state} />
-                    <button className="dash-session-join-btn" title="Join session">
-                      <Video size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {upcomingSessions.length === 0 && (
-                <p className="dash-empty">No upcoming sessions. <Link to="/courses">Browse courses</Link></p>
+              {loading ? (
+                <p style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>Loading...</p>
+              ) : (
+                <div className="dash-sessions-list">
+                  {upcomingSessions.map((session) => {
+                    const d = session.dates ? new Date(session.dates) : null;
+                    return (
+                      <div className="dash-session-row" key={session.id}>
+                        <div className="dash-session-date-block">
+                          <span className="dash-session-day">{d ? d.getDate() : '—'}</span>
+                          <span className="dash-session-month">{d ? d.toLocaleString('en', { month: 'short' }) : ''}</span>
+                        </div>
+                        <div className="dash-session-info">
+                          <span className="dash-session-subject">{session.subject}</span>
+                          <span className="dash-session-meta">
+                            {session.personLabel}: {session.personName}
+                            {d ? ` · ${d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}` : ''}
+                            {session.level ? ` · ${session.level}` : ''}
+                          </span>
+                        </div>
+                        <StateTag state={session.state} />
+                        <button className="dash-session-join-btn" title="Join session">
+                          <Video size={16} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {!loading && upcomingSessions.length === 0 && (
+                <p className="dash-empty">No sessions yet. <Link to="/courses">Browse courses</Link></p>
               )}
             </div>
 
@@ -190,43 +305,24 @@ const DashboardPage = memo(function DashboardPage() {
                 </Link>
               </div>
 
-              {isTeacher ? (
-                <div className="dash-courses-list">
-                  {TEACHING_COURSES.map((course) => (
-                    <div className="dash-course-row" key={course.id}>
-                      <div className="dash-course-icon-wrap">
-                        <MdSchool size={20} />
-                      </div>
-                      <div className="dash-course-info">
-                        <span className="dash-course-name">{course.subject}</span>
-                        <span className="dash-course-meta">
-                          {course.students} students · €{course.hourly_price}/hr · {course.sessions_this_week} sessions/week
-                        </span>
-                      </div>
-                      <div className="dash-course-rating">
-                        <Star size={14} className="courses-rating-star" />
-                        {course.rating}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              {loading ? (
+                <p style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>Loading...</p>
               ) : (
                 <div className="dash-courses-list">
-                  {ENROLLED_COURSES.map((course) => (
+                  {myCourses.length === 0 ? (
+                    <p className="dash-empty">No courses yet. <Link to="/courses">Browse courses</Link></p>
+                  ) : myCourses.map((course) => (
                     <div className="dash-course-row" key={course.id}>
                       <div className="dash-course-icon-wrap">
-                        <BookOpen size={20} />
+                        {isTeacher ? <MdSchool size={20} /> : <BookOpen size={20} />}
                       </div>
                       <div className="dash-course-info">
                         <span className="dash-course-name">{course.subject}</span>
                         <span className="dash-course-meta">
-                          {course.teacher} · €{course.hourly_price}/hr
+                          {course.teacher ? `${course.teacher} · ` : ''}€{course.hourly_price}/hr
+                          {course.level ? ` · ${course.level}` : ''}
                         </span>
-                        <div className="dash-progress-bar">
-                          <div className="dash-progress-fill" style={{ width: `${course.progress}%` }} />
-                        </div>
                       </div>
-                      <span className="dash-course-progress-text">{course.progress}%</span>
                     </div>
                   ))}
                 </div>
@@ -245,7 +341,9 @@ const DashboardPage = memo(function DashboardPage() {
                 </h2>
               </div>
               <div className="dash-notif-list">
-                {NOTIFICATIONS.map((n) => (
+                {notifications.length === 0 ? (
+                  <p style={{ color: '#9CA3AF', padding: '0.5rem 0', fontSize: '0.85rem' }}>No notifications.</p>
+                ) : notifications.map((n) => (
                   <div className="dash-notif-row" key={n.id}>
                     <div className={`dash-notif-icon ${n.type === 'success' ? 'dash-notif-icon--success' : 'dash-notif-icon--reminder'}`}>
                       {n.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
@@ -265,7 +363,9 @@ const DashboardPage = memo(function DashboardPage() {
                 </h2>
               </div>
               <div className="dash-messages-list">
-                {RECENT_MESSAGES.map((msg) => (
+                {messages.length === 0 ? (
+                  <p style={{ color: '#9CA3AF', padding: '0.5rem 0', fontSize: '0.85rem' }}>No messages yet.</p>
+                ) : messages.map((msg) => (
                   <div className="dash-msg-row" key={msg.id}>
                     <div className="dash-msg-avatar">
                       {msg.sender.split(' ').map(w => w[0]).join('')}
@@ -292,7 +392,18 @@ const DashboardPage = memo(function DashboardPage() {
               </div>
               <div className="dash-week-grid">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
-                  const hasSessions = [0, 2, 4].includes(i);
+                  /* Mark days that have real sessions this week */
+                  const now = new Date();
+                  const mondayOffset = (now.getDay() + 6) % 7;
+                  const monday = new Date(now);
+                  monday.setDate(now.getDate() - mondayOffset);
+                  const targetDate = new Date(monday);
+                  targetDate.setDate(monday.getDate() + i);
+                  const hasSessions = upcomingSessions.some((s) => {
+                    if (!s.dates) return false;
+                    const sd = new Date(s.dates);
+                    return sd.toDateString() === targetDate.toDateString();
+                  });
                   return (
                     <div className={`dash-week-day ${hasSessions ? 'dash-week-day--active' : ''}`} key={day}>
                       <span className="dash-week-label">{day}</span>

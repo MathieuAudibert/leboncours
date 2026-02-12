@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback, useMemo, useRef } from 'react';
+import React, { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -9,8 +9,6 @@ import {
   SlidersHorizontal,
   Download,
   RotateCcw,
-  Star,
-  Users,
   Info,
   X,
   User,
@@ -19,41 +17,23 @@ import {
   Euro,
   MessageSquare,
   CheckCircle,
+  Plus,
+  FileText,
+  GraduationCap,
 } from 'lucide-react';
 import { MdFilterListOff } from 'react-icons/md';
+import { useAuth } from '../../context/AuthContext';
+import {
+  apiListCourses,
+  apiCreateCourse,
+  apiListTeacherCourses,
+  apiCreateTeacherCourse,
+  apiListUsers,
+  apiCreateEventCourse,
+} from '../../api';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-/* ═══════════════════════════════════════
-   MOCK DATA — matches DB schema (Courses + teacher join)
-   ═══════════════════════════════════════ */
-const MOCK_COURSES = [
-  { id: 1, subject: 'Rust Systems Programming', hourly_price: 45, level: 'Advanced', description: 'Deep dive into ownership, lifetimes and systems-level Rust.', teacher: 'Alex M.', rating: 4.9, students: 87, category: 'Programming' },
-  { id: 2, subject: 'Guitar & Music Theory', hourly_price: 25, level: 'Beginner', description: 'Learn chords, scales and music theory from scratch.', teacher: 'Sophie L.', rating: 4.7, students: 134, category: 'Music' },
-  { id: 3, subject: 'French for Beginners', hourly_price: 20, level: 'Beginner', description: 'Conversational French with pronunciation focus.', teacher: 'Pierre D.', rating: 4.8, students: 210, category: 'Languages' },
-  { id: 4, subject: 'Calculus I & II', hourly_price: 35, level: 'Intermediate', description: 'Limits, derivatives, integrals and series.', teacher: 'Marie C.', rating: 4.6, students: 98, category: 'Mathematics' },
-  { id: 5, subject: 'React & TypeScript', hourly_price: 50, level: 'Intermediate', description: 'Build production-grade React apps with TypeScript.', teacher: 'Lucas B.', rating: 4.9, students: 156, category: 'Programming' },
-  { id: 6, subject: 'Watercolor Painting', hourly_price: 30, level: 'Beginner', description: 'Techniques for landscape and portrait watercolors.', teacher: 'Emma R.', rating: 4.5, students: 63, category: 'Art' },
-  { id: 7, subject: 'Organic Chemistry', hourly_price: 40, level: 'Advanced', description: 'Reactions, mechanisms and synthesis strategies.', teacher: 'Hugo T.', rating: 4.4, students: 45, category: 'Science' },
-  { id: 8, subject: 'Python Data Science', hourly_price: 42, level: 'Intermediate', description: 'Pandas, NumPy, matplotlib and scikit-learn.', teacher: 'Léa F.', rating: 4.8, students: 201, category: 'Programming' },
-  { id: 9, subject: 'Spanish Conversation', hourly_price: 22, level: 'Intermediate', description: 'Practice real-world Spanish dialogue and grammar.', teacher: 'Carlos G.', rating: 4.7, students: 178, category: 'Languages' },
-  { id: 10, subject: 'Piano — Classical', hourly_price: 35, level: 'Intermediate', description: 'Classical repertoire from Bach to Chopin.', teacher: 'Julie P.', rating: 4.9, students: 92, category: 'Music' },
-  { id: 11, subject: 'Machine Learning Fundamentals', hourly_price: 55, level: 'Advanced', description: 'Supervised & unsupervised learning, neural networks.', teacher: 'Nathan K.', rating: 4.8, students: 112, category: 'Programming' },
-  { id: 12, subject: 'Yoga & Meditation', hourly_price: 18, level: 'Beginner', description: 'Hatha yoga basics and mindfulness meditation.', teacher: 'Clara V.', rating: 4.6, students: 245, category: 'Fitness' },
-  { id: 13, subject: 'Linear Algebra', hourly_price: 38, level: 'Intermediate', description: 'Vectors, matrices, eigenvalues and applications.', teacher: 'Marie C.', rating: 4.7, students: 76, category: 'Mathematics' },
-  { id: 14, subject: 'Digital Photography', hourly_price: 28, level: 'Beginner', description: 'Composition, lighting and post-processing essentials.', teacher: 'Thomas H.', rating: 4.5, students: 89, category: 'Art' },
-  { id: 15, subject: 'German for Travelers', hourly_price: 24, level: 'Beginner', description: 'Essential German for travel and everyday situations.', teacher: 'Anna W.', rating: 4.6, students: 67, category: 'Languages' },
-  { id: 16, subject: 'Algorithms & Data Structures', hourly_price: 48, level: 'Advanced', description: 'Sorting, graphs, dynamic programming and complexity.', teacher: 'Lucas B.', rating: 4.9, students: 143, category: 'Programming' },
-  { id: 17, subject: 'Physics — Mechanics', hourly_price: 36, level: 'Intermediate', description: 'Newtonian mechanics, energy and rotational dynamics.', teacher: 'Hugo T.', rating: 4.5, students: 54, category: 'Science' },
-  { id: 18, subject: 'Creative Writing', hourly_price: 26, level: 'Beginner', description: 'Short stories, character development and narrative voice.', teacher: 'Emma R.', rating: 4.7, students: 102, category: 'Art' },
-  { id: 19, subject: 'Strength Training', hourly_price: 30, level: 'Intermediate', description: 'Programming, form and progressive overload principles.', teacher: 'Marc D.', rating: 4.6, students: 158, category: 'Fitness' },
-  { id: 20, subject: 'Japanese — JLPT N5', hourly_price: 28, level: 'Beginner', description: 'Hiragana, katakana, basic kanji and grammar.', teacher: 'Yuki S.', rating: 4.8, students: 190, category: 'Languages' },
-  { id: 21, subject: 'Docker & Kubernetes', hourly_price: 52, level: 'Advanced', description: 'Containerization, orchestration and cloud deployment.', teacher: 'Nathan K.', rating: 4.7, students: 88, category: 'Programming' },
-  { id: 22, subject: 'Statistics & Probability', hourly_price: 34, level: 'Intermediate', description: 'Distributions, hypothesis testing and regression.', teacher: 'Marie C.', rating: 4.6, students: 71, category: 'Mathematics' },
-  { id: 23, subject: 'Singing — Pop & Jazz', hourly_price: 32, level: 'Intermediate', description: 'Vocal technique, range and improvisation.', teacher: 'Sophie L.', rating: 4.8, students: 115, category: 'Music' },
-  { id: 24, subject: 'Italian Cooking', hourly_price: 20, level: 'Beginner', description: 'Pasta, sauces and classic Italian home cooking.', teacher: 'Luca R.', rating: 4.9, students: 203, category: 'Other' },
-];
 
 /* ═══════════════════════════════════════
    CUSTOM CELL RENDERERS
@@ -62,14 +42,17 @@ function SubjectRenderer({ data }) {
   return (
     <span className="courses-subject-row">
       <span className="courses-subject-name">{data.subject}</span>
-      <span className="courses-info-trigger" title={data.description}>
-        <Info size={15} className="courses-info-icon" />
-      </span>
+      {data.description && (
+        <span className="courses-info-trigger" title={data.description}>
+          <Info size={15} className="courses-info-icon" />
+        </span>
+      )}
     </span>
   );
 }
 
 function TeacherRenderer({ value }) {
+  if (!value) return <span className="courses-teacher"><span className="courses-teacher-name">—</span></span>;
   const initials = value.split(' ').map(w => w[0]).join('');
   return (
     <span className="courses-teacher">
@@ -90,38 +73,178 @@ function PriceRenderer({ value }) {
   return <span className="courses-price">€{value}/hr</span>;
 }
 
-function RatingRenderer({ value }) {
-  return (
-    <span className="courses-rating">
-      <Star size={14} className="courses-rating-star" />
-      {value}
-    </span>
-  );
+function DescriptionRenderer({ value }) {
+  return <span className="courses-description">{value || '—'}</span>;
 }
 
-function StudentsRenderer({ value }) {
-  return (
-    <span className="courses-students">
-      <Users size={14} />
-      {value}
-    </span>
-  );
-}
+/* ═══════════════════════════════════════
+   CREATE COURSE MODAL (Teachers only)
+   ═══════════════════════════════════════ */
+function CreateCourseModal({ onClose, onCreated }) {
+  const [subject, setSubject] = useState('');
+  const [hourlyPrice, setHourlyPrice] = useState('');
+  const [level, setLevel] = useState('Beginner');
+  const [description, setDescription] = useState('');
+  const [created, setCreated] = useState(false);
 
-function CategoryRenderer({ value }) {
-  return <span className="courses-category-badge">{value}</span>;
+  const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+
+  const canSubmit = subject.trim().length > 0 && hourlyPrice && Number(hourlyPrice) > 0;
+
+  const handleCreate = () => {
+    const newCourse = {
+      subject: subject.trim(),
+      hourly_price: Number(hourlyPrice),
+      level,
+      description: description.trim() || null,
+    };
+    onCreated(newCourse);
+    setCreated(true);
+    setTimeout(() => {
+      setCreated(false);
+      onClose();
+    }, 2000);
+  };
+
+  return (
+    <div className="booking-overlay" onClick={onClose}>
+      <div className="booking-modal create-course-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="booking-close" onClick={onClose}>
+          <X size={20} />
+        </button>
+
+        {created ? (
+          <div className="booking-success">
+            <div className="booking-success-icon">
+              <CheckCircle size={48} />
+            </div>
+            <h3>Course Created!</h3>
+            <p>Your new course has been added to the catalog.</p>
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="booking-header">
+              <div className="booking-badges">
+                <span className="courses-category-badge">
+                  <GraduationCap size={12} />
+                  Teacher
+                </span>
+              </div>
+              <h2 className="booking-title">Create a New Course</h2>
+              <p className="booking-desc">Fill in the details below to publish your course on LeBonCours.</p>
+            </div>
+
+            {/* Form */}
+            <div className="booking-form">
+              <div className="booking-field">
+                <label className="booking-label">
+                  <BookOpen size={14} />
+                  Subject *
+                </label>
+                <input
+                  type="text"
+                  className="booking-input"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="e.g. React & TypeScript"
+                  maxLength={255}
+                />
+              </div>
+
+              <div className="booking-field-row">
+                <div className="booking-field">
+                  <label className="booking-label">
+                    <Euro size={14} />
+                    Hourly Price (€) *
+                  </label>
+                  <input
+                    type="number"
+                    className="booking-input"
+                    value={hourlyPrice}
+                    onChange={(e) => setHourlyPrice(e.target.value)}
+                    placeholder="e.g. 35"
+                    min={1}
+                    max={500}
+                  />
+                </div>
+                <div className="booking-field">
+                  <label className="booking-label">
+                    <Tag size={14} />
+                    Level
+                  </label>
+                  <select
+                    className="booking-input create-course-select"
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value)}
+                  >
+                    {LEVELS.map((l) => (
+                      <option key={l} value={l}>{l}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="booking-field">
+                <label className="booking-label">
+                  <FileText size={14} />
+                  Description (optional)
+                </label>
+                <textarea
+                  className="booking-textarea"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe what students will learn..."
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            {/* Preview */}
+            {subject && (
+              <div className="create-course-preview">
+                <span className="create-course-preview-label">Preview</span>
+                <div className="create-course-preview-row">
+                  <span className={`courses-level courses-level--${level.toLowerCase()}`}>{level}</span>
+                  <span className="courses-price">€{hourlyPrice || 0}/hr</span>
+                </div>
+                <span className="create-course-preview-subject">{subject}</span>
+                {description && <span className="create-course-preview-desc">{description}</span>}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="booking-actions">
+              <button className="btn btn--outline booking-cancel-btn" onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                className="btn btn--primary booking-book-btn"
+                onClick={handleCreate}
+                disabled={!canSubmit}
+              >
+                <Plus size={16} />
+                Create Course
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
 /* ═══════════════════════════════════════
    BOOKING MODAL
    ═══════════════════════════════════════ */
-function BookingModal({ course, onClose }) {
+function BookingModal({ course, onClose, onBooked }) {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [message, setMessage] = useState('');
   const [booked, setBooked] = useState(false);
 
   const handleBook = () => {
+    if (onBooked) onBooked(course, selectedDate, selectedTime, message);
     setBooked(true);
     setTimeout(() => {
       setBooked(false);
@@ -142,43 +265,36 @@ function BookingModal({ course, onClose }) {
               <CheckCircle size={48} />
             </div>
             <h3>Session Booked!</h3>
-            <p>Your booking request has been sent to the teacher.</p>
+            <p>Your booking request has been sent.</p>
           </div>
         ) : (
           <>
             {/* Header */}
             <div className="booking-header">
               <div className="booking-badges">
-                <span className="courses-category-badge">{course.category}</span>
-                <span className={`courses-level courses-level--${course.level?.toLowerCase()}`}>
-                  {course.level}
-                </span>
+                {course.level && (
+                  <span className={`courses-level courses-level--${course.level.toLowerCase()}`}>
+                    {course.level}
+                  </span>
+                )}
               </div>
               <h2 className="booking-title">{course.subject}</h2>
-              <p className="booking-desc">{course.description}</p>
+              <p className="booking-desc">{course.description || 'No description available.'}</p>
             </div>
 
             {/* Course details */}
             <div className="booking-details">
-              <div className="booking-detail">
-                <User size={16} />
-                <span className="booking-detail-label">Teacher</span>
-                <span className="booking-detail-value">{course.teacher}</span>
-              </div>
+              {course.teacher && (
+                <div className="booking-detail">
+                  <User size={16} />
+                  <span className="booking-detail-label">Teacher</span>
+                  <span className="booking-detail-value">{course.teacher}</span>
+                </div>
+              )}
               <div className="booking-detail">
                 <Euro size={16} />
                 <span className="booking-detail-label">Price</span>
                 <span className="booking-detail-value booking-price">€{course.hourly_price}/hr</span>
-              </div>
-              <div className="booking-detail">
-                <Star size={16} className="courses-rating-star" />
-                <span className="booking-detail-label">Rating</span>
-                <span className="booking-detail-value">{course.rating} / 5</span>
-              </div>
-              <div className="booking-detail">
-                <Users size={16} />
-                <span className="booking-detail-label">Students</span>
-                <span className="booking-detail-value">{course.students} enrolled</span>
               </div>
             </div>
 
@@ -250,10 +366,91 @@ function BookingModal({ course, onClose }) {
    MAIN COMPONENT
    ═══════════════════════════════════════ */
 const CoursesPage = memo(function CoursesPage() {
+  const { user, token } = useAuth();
+  const isTeacher = user?.role === 'Teacher';
   const gridRef = useRef(null);
   const [quickFilter, setQuickFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+
+  /* Fetch courses + teacher-courses + teacher users, then join client-side */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchAll() {
+      try {
+        const [coursesRes, tcRes, teachersRes] = await Promise.all([
+          apiListCourses({ per_page: 100 }),
+          apiListTeacherCourses({ per_page: 100 }, token).catch(() => ({ data: [] })),
+          apiListUsers({ role: 'Teacher', per_page: 100 }, token).catch(() => ({ data: [] })),
+        ]);
+
+        if (cancelled) return;
+
+        const teacherMap = {};
+        (teachersRes.data || []).forEach((t) => {
+          teacherMap[t.id] = `${t.firstname} ${t.name}`;
+        });
+
+        const courseTeacherMap = {};
+        (tcRes.data || []).forEach((tc) => {
+          if (tc.course_id && tc.teacher_id) {
+            courseTeacherMap[tc.course_id] = teacherMap[tc.teacher_id] || null;
+          }
+        });
+
+        const enriched = (coursesRes.data || []).map((c) => ({
+          ...c,
+          teacher: courseTeacherMap[c.id] || null,
+        }));
+
+        setCourses(enriched);
+      } catch {
+        if (!cancelled) setCourses([]);
+      } finally {
+        if (!cancelled) setLoadingCourses(false);
+      }
+    }
+
+    fetchAll();
+    return () => { cancelled = true; };
+  }, [token]);
+
+  const handleCourseCreated = useCallback(async (newCourseData) => {
+    try {
+      const created = await apiCreateCourse(
+        {
+          subject: newCourseData.subject,
+          hourly_price: newCourseData.hourly_price,
+          level: newCourseData.level,
+          description: newCourseData.description,
+        },
+        token,
+      );
+      // Also create teacher-course link
+      if (user?.id && created?.id) {
+        await apiCreateTeacherCourse({ teacher_id: user.id, course_id: created.id }, token).catch(() => { });
+      }
+      const enriched = { ...created, teacher: `${user.firstname} ${user.name}` };
+      setCourses((prev) => [enriched, ...prev]);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }, [token, user]);
+
+  const handleBookSession = useCallback(async (course, date, time, _message) => {
+    if (!user?.id || !course?.id) return;
+    try {
+      const dates = `${date}T${time}:00`;
+      await apiCreateEventCourse({ student_id: user.id, course_id: course.id, dates, state: 'Pending' }, token);
+    } catch {
+      /* silently fail — booking modal already shows success */
+    }
+  }, [user, token]);
 
   const columnDefs = useMemo(() => [
     {
@@ -275,14 +472,6 @@ const CoursesPage = memo(function CoursesPage() {
       cellRenderer: TeacherRenderer,
     },
     {
-      headerName: 'Category',
-      field: 'category',
-      flex: 1,
-      minWidth: 140,
-      filter: 'agTextColumnFilter',
-      cellRenderer: CategoryRenderer,
-    },
-    {
       headerName: 'Level',
       field: 'level',
       width: 145,
@@ -298,18 +487,12 @@ const CoursesPage = memo(function CoursesPage() {
       sort: 'asc',
     },
     {
-      headerName: 'Rating',
-      field: 'rating',
-      width: 110,
-      filter: 'agNumberColumnFilter',
-      cellRenderer: RatingRenderer,
-    },
-    {
-      headerName: 'Students',
-      field: 'students',
-      width: 125,
-      filter: 'agNumberColumnFilter',
-      cellRenderer: StudentsRenderer,
+      headerName: 'Description',
+      field: 'description',
+      flex: 2,
+      minWidth: 200,
+      filter: 'agTextColumnFilter',
+      cellRenderer: DescriptionRenderer,
     },
   ], []);
 
@@ -344,13 +527,15 @@ const CoursesPage = memo(function CoursesPage() {
     setShowFilters(prev => !prev);
   }, []);
 
-  // Stats
-  const stats = useMemo(() => ({
-    total: MOCK_COURSES.length,
-    avgPrice: Math.round(MOCK_COURSES.reduce((s, c) => s + c.hourly_price, 0) / MOCK_COURSES.length),
-    categories: [...new Set(MOCK_COURSES.map(c => c.category))].length,
-    avgRating: (MOCK_COURSES.reduce((s, c) => s + c.rating, 0) / MOCK_COURSES.length).toFixed(1),
-  }), []);
+  // Stats derived from real data
+  const stats = useMemo(() => {
+    if (courses.length === 0) return { total: 0, avgPrice: 0, levels: 0 };
+    return {
+      total: courses.length,
+      avgPrice: Math.round(courses.reduce((s, c) => s + c.hourly_price, 0) / courses.length),
+      levels: [...new Set(courses.map(c => c.level).filter(Boolean))].length,
+    };
+  }, [courses]);
 
   return (
     <div className="courses-page">
@@ -364,7 +549,7 @@ const CoursesPage = memo(function CoursesPage() {
             </div>
             <h1 className="courses-title">Browse Courses</h1>
             <p className="courses-subtitle">
-              Explore {stats.total} courses across {stats.categories} categories — find the perfect mentor for you.
+              Explore {stats.total} courses across {stats.levels} levels — find the perfect mentor for you.
             </p>
           </div>
 
@@ -379,8 +564,8 @@ const CoursesPage = memo(function CoursesPage() {
               <span className="courses-stat-chip-label">Avg. price</span>
             </div>
             <div className="courses-stat-chip">
-              <span className="courses-stat-chip-value">{stats.avgRating}</span>
-              <span className="courses-stat-chip-label">Avg. rating</span>
+              <span className="courses-stat-chip-value">{stats.levels}</span>
+              <span className="courses-stat-chip-label">Levels</span>
             </div>
           </div>
         </div>
@@ -399,6 +584,16 @@ const CoursesPage = memo(function CoursesPage() {
           </div>
 
           <div className="courses-toolbar-actions">
+            {isTeacher && (
+              <button
+                className="courses-toolbar-btn courses-toolbar-btn--create"
+                onClick={() => setShowCreateModal(true)}
+                title="Create a new course"
+              >
+                <Plus size={16} />
+                <span>New Course</span>
+              </button>
+            )}
             <button
               className={`courses-toolbar-btn ${showFilters ? 'courses-toolbar-btn--active' : ''}`}
               onClick={toggleFilters}
@@ -430,7 +625,7 @@ const CoursesPage = memo(function CoursesPage() {
         <div className="courses-grid-wrapper ag-theme-quartz">
           <AgGridReact
             ref={gridRef}
-            rowData={MOCK_COURSES}
+            rowData={courses}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             quickFilterText={quickFilter}
@@ -450,10 +645,18 @@ const CoursesPage = memo(function CoursesPage() {
         </div>
 
         {/* Footer note */}
-        <p className="courses-footer-note">
-          <RotateCcw size={14} />
-          <span>Data refreshes automatically once the backend is connected.</span>
-        </p>
+        {loadingCourses && (
+          <p className="courses-footer-note">
+            <RotateCcw size={14} />
+            <span>Loading courses from the backend...</span>
+          </p>
+        )}
+        {!loadingCourses && courses.length === 0 && (
+          <p className="courses-footer-note">
+            <RotateCcw size={14} />
+            <span>No courses found. Make sure the backend is running on port 3001.</span>
+          </p>
+        )}
       </div>
 
       {/* Booking Modal */}
@@ -461,6 +664,15 @@ const CoursesPage = memo(function CoursesPage() {
         <BookingModal
           course={selectedCourse}
           onClose={() => setSelectedCourse(null)}
+          onBooked={handleBookSession}
+        />
+      )}
+
+      {/* Create Course Modal (Teachers only) */}
+      {showCreateModal && (
+        <CreateCourseModal
+          onClose={() => setShowCreateModal(false)}
+          onCreated={handleCourseCreated}
         />
       )}
     </div>

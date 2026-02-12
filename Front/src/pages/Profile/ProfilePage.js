@@ -1,62 +1,114 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   Mail,
-  Star,
   BookOpen,
   Calendar,
   Clock,
-  MapPin,
   Edit3,
   Settings,
-  Award,
   ChevronRight,
 } from 'lucide-react';
 import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
+import {
+  apiListCourses,
+  apiListTeacherCourses,
+  apiListEventCourses,
+  apiListUsers,
+} from '../../api';
 
 /* ═══════════════════════════════════════
-   MOCK DATA matching the user roles
-   ═══════════════════════════════════════ */
-const STUDENT_COURSES = [
-  { id: 1, name: 'React & TypeScript', teacher: 'Lucas B.', price: '€50/hr' },
-  { id: 2, name: 'French for Beginners', teacher: 'Pierre D.', price: '€20/hr' },
-  { id: 3, name: 'Calculus I & II', teacher: 'Marie C.', price: '€35/hr' },
-];
-
-const TEACHER_COURSES = [
-  { id: 1, name: 'React & TypeScript', students: 156, price: '€50/hr' },
-  { id: 2, name: 'Algorithms & Data Structures', students: 143, price: '€48/hr' },
-];
-
-const STUDENT_SESSIONS = [
-  { id: 1, subject: 'React & TypeScript', with: 'Lucas B.', date: 'Feb 12, 2026', time: '10:00', state: 'Confirmed' },
-  { id: 2, subject: 'French for Beginners', with: 'Pierre D.', date: 'Feb 14, 2026', time: '14:30', state: 'Pending' },
-  { id: 3, subject: 'Calculus I & II', with: 'Marie C.', date: 'Feb 16, 2026', time: '09:00', state: 'Confirmed' },
-];
-
-const TEACHER_SESSIONS = [
-  { id: 1, subject: 'React & TypeScript', with: 'Emma L.', date: 'Feb 12, 2026', time: '10:00', state: 'Confirmed' },
-  { id: 2, subject: 'React & TypeScript', with: 'Thomas R.', date: 'Feb 13, 2026', time: '15:00', state: 'Pending' },
-  { id: 3, subject: 'Algorithms & DS', with: 'Sarah K.', date: 'Feb 15, 2026', time: '11:30', state: 'Confirmed' },
-];
-
-const REVIEWS = [
-  { id: 1, author: 'Emma L.', rating: 5, text: 'Excellent explanation of React hooks. Very patient and clear!', date: '2 days ago' },
-  { id: 2, author: 'Thomas R.', rating: 5, text: 'Great session on TypeScript generics. Would book again.', date: '1 week ago' },
-];
-
-/* ═══════════════════════════════════════
-   PROFILE PAGE
+   PROFILE PAGE — all data from the backend
    ═══════════════════════════════════════ */
 const ProfilePage = memo(function ProfilePage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
+  const [courses, setCourses] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    let cancelled = false;
+    const isTeacher = user.role === 'Teacher';
+
+    async function fetchData() {
+      try {
+        /* Fetch all courses + all users for name resolution */
+        const [coursesRes, usersRes] = await Promise.all([
+          apiListCourses({ per_page: 100 }),
+          apiListUsers({ per_page: 100 }, token).catch(() => ({ data: [] })),
+        ]);
+
+        const courseMap = {};
+        (coursesRes.data || []).forEach((c) => { courseMap[c.id] = c; });
+        const userMap = {};
+        (usersRes.data || []).forEach((u) => { userMap[u.id] = u; });
+
+        if (isTeacher) {
+          /* Teacher: courses via teacher-courses, sessions via event-courses on those courses */
+          const tcRes = await apiListTeacherCourses({ teacher_id: user.id, per_page: 100 }, token).catch(() => ({ data: [] }));
+          const teacherCourseIds = (tcRes.data || []).map((tc) => tc.course_id).filter(Boolean);
+          const myCourses = teacherCourseIds.map((cid) => courseMap[cid]).filter(Boolean);
+          if (!cancelled) setCourses(myCourses);
+
+          /* Sessions for teacher: event-courses on courses I teach */
+          const allEvents = await apiListEventCourses({ per_page: 100 }, token).catch(() => ({ data: [] }));
+          const mySessions = (allEvents.data || [])
+            .filter((ev) => teacherCourseIds.includes(ev.course_id))
+            .map((ev) => ({
+              ...ev,
+              courseName: courseMap[ev.course_id]?.subject || 'Unknown',
+              withName: userMap[ev.student_id]
+                ? `${userMap[ev.student_id].firstname} ${userMap[ev.student_id].name}`
+                : 'Student',
+            }));
+          if (!cancelled) setSessions(mySessions);
+        } else {
+          /* Student: sessions via event-courses where student_id = me */
+          const evRes = await apiListEventCourses({ student_id: user.id, per_page: 100 }, token).catch(() => ({ data: [] }));
+          const events = evRes.data || [];
+
+          /* Resolve course names and teacher names */
+          const tcRes = await apiListTeacherCourses({ per_page: 100 }, token).catch(() => ({ data: [] }));
+          const courseTeacherMap = {};
+          (tcRes.data || []).forEach((tc) => {
+            if (tc.course_id && tc.teacher_id) {
+              courseTeacherMap[tc.course_id] = userMap[tc.teacher_id]
+                ? `${userMap[tc.teacher_id].firstname} ${userMap[tc.teacher_id].name}`
+                : null;
+            }
+          });
+
+          const myCourseIds = [...new Set(events.map((e) => e.course_id).filter(Boolean))];
+          const myCourses = myCourseIds.map((cid) => ({
+            ...courseMap[cid],
+            teacher: courseTeacherMap[cid] || null,
+          })).filter((c) => c.id);
+          if (!cancelled) setCourses(myCourses);
+
+          const mySessions = events.map((ev) => ({
+            ...ev,
+            courseName: courseMap[ev.course_id]?.subject || 'Unknown',
+            withName: courseTeacherMap[ev.course_id] || 'Teacher',
+          }));
+          if (!cancelled) setSessions(mySessions);
+        }
+      } catch {
+        /* silently fail */
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => { cancelled = true; };
+  }, [user, token]);
 
   if (!user) return <Navigate to="/login" replace />;
 
   const isTeacher = user.role === 'Teacher';
-  const courses = isTeacher ? TEACHER_COURSES : STUDENT_COURSES;
-  const sessions = isTeacher ? TEACHER_SESSIONS : STUDENT_SESSIONS;
 
   return (
     <div className="profile-page">
@@ -66,7 +118,7 @@ const ProfilePage = memo(function ProfilePage() {
           <div className="profile-cover-bg profile-cover-bg--filled" />
           <div className="profile-avatar-wrap">
             <div className="profile-avatar profile-avatar--filled">
-              {user.firstname[0]}{user.name[0]}
+              {user.firstname?.[0]}{user.name?.[0]}
             </div>
             <div className="profile-avatar-badge">
               <MdVerified size={18} />
@@ -92,22 +144,10 @@ const ProfilePage = memo(function ProfilePage() {
                   <Mail size={14} />
                   <span>{user.email}</span>
                 </div>
-                <div className="profile-meta-item">
-                  <MapPin size={14} />
-                  <span>{user.location}</span>
-                </div>
-                <div className="profile-meta-item">
-                  <Calendar size={14} />
-                  <span>Joined {new Date(user.joinedAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</span>
-                </div>
-              </div>
-
-              <div className="profile-bio">
-                <p className="profile-bio-text">{user.bio}</p>
               </div>
             </div>
 
-            {/* Quick stats */}
+            {/* Quick stats — derived from real data */}
             <div className="profile-card">
               <h3 className="profile-card-title">Overview</h3>
               <div className="profile-stat-grid">
@@ -116,8 +156,17 @@ const ProfilePage = memo(function ProfilePage() {
                     <BookOpen size={18} />
                   </div>
                   <div>
-                    <span className="profile-stat-value">{user.stats.courses}</span>
-                    <span className="profile-stat-label">Courses</span>
+                    <span className="profile-stat-value">{courses.length}</span>
+                    <span className="profile-stat-label">{isTeacher ? 'Teaching' : 'Enrolled'}</span>
+                  </div>
+                </div>
+                <div className="profile-stat-item">
+                  <div className="profile-stat-icon-wrap">
+                    <Calendar size={18} />
+                  </div>
+                  <div>
+                    <span className="profile-stat-value">{sessions.length}</span>
+                    <span className="profile-stat-label">Sessions</span>
                   </div>
                 </div>
                 <div className="profile-stat-item">
@@ -125,26 +174,10 @@ const ProfilePage = memo(function ProfilePage() {
                     <Clock size={18} />
                   </div>
                   <div>
-                    <span className="profile-stat-value">{user.stats.hours}h</span>
-                    <span className="profile-stat-label">Hours</span>
-                  </div>
-                </div>
-                <div className="profile-stat-item">
-                  <div className="profile-stat-icon-wrap">
-                    <Star size={18} />
-                  </div>
-                  <div>
-                    <span className="profile-stat-value">{user.stats.rating}</span>
-                    <span className="profile-stat-label">Rating</span>
-                  </div>
-                </div>
-                <div className="profile-stat-item">
-                  <div className="profile-stat-icon-wrap">
-                    <Award size={18} />
-                  </div>
-                  <div>
-                    <span className="profile-stat-value">{user.stats.reviews}</span>
-                    <span className="profile-stat-label">Reviews</span>
+                    <span className="profile-stat-value">
+                      {sessions.filter((s) => s.state === 'Confirmed').length}
+                    </span>
+                    <span className="profile-stat-label">Confirmed</span>
                   </div>
                 </div>
               </div>
@@ -160,80 +193,74 @@ const ProfilePage = memo(function ProfilePage() {
 
           {/* ── Main content ── */}
           <div className="profile-main">
-            {/* Courses */}
-            <div className="profile-card">
-              <h3 className="profile-card-title">
-                <BookOpen size={18} />
-                {isTeacher ? 'Teaching Courses' : 'Enrolled Courses'}
-              </h3>
-              <div className="profile-courses-list">
-                {courses.map((c) => (
-                  <div className="profile-course-row" key={c.id}>
-                    <div className="profile-course-icon profile-course-icon--filled">
-                      <BookOpen size={18} />
-                    </div>
-                    <div className="profile-course-info">
-                      <span className="profile-course-name">{c.name}</span>
-                      <span className="profile-course-meta">
-                        {isTeacher ? `${c.students} students` : c.teacher} · {c.price}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+            {loading ? (
+              <div className="profile-card">
+                <p style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>Loading data from the database...</p>
               </div>
-            </div>
-
-            {/* Upcoming Sessions */}
-            <div className="profile-card">
-              <h3 className="profile-card-title">
-                <Calendar size={18} />
-                Upcoming Sessions
-              </h3>
-              <div className="profile-sessions-list">
-                {sessions.map((s) => (
-                  <div className="profile-session-row" key={s.id}>
-                    <div className="profile-session-date-block">
-                      <span className="profile-session-day">{s.date.split(' ')[1].replace(',', '')}</span>
-                      <span className="profile-session-month">{s.date.split(' ')[0]}</span>
-                    </div>
-                    <div className="profile-session-info">
-                      <span className="profile-session-subject">{s.subject}</span>
-                      <span className="profile-session-meta">with {s.with} · {s.time}</span>
-                    </div>
-                    <span className={`profile-session-state profile-session-state--${s.state.toLowerCase()}`}>
-                      {s.state}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Reviews */}
-            <div className="profile-card">
-              <h3 className="profile-card-title">
-                <Star size={18} />
-                Recent Reviews
-              </h3>
-              <div className="profile-reviews-list">
-                {REVIEWS.map((r) => (
-                  <div className="profile-review-row" key={r.id}>
-                    <div className="profile-review-avatar">
-                      {r.author.split(' ').map(w => w[0]).join('')}
-                    </div>
-                    <div className="profile-review-body">
-                      <div className="profile-review-header">
-                        <span className="profile-review-author">{r.author}</span>
-                        <span className="profile-review-date">{r.date}</span>
+            ) : (
+              <>
+                {/* Courses */}
+                <div className="profile-card">
+                  <h3 className="profile-card-title">
+                    <BookOpen size={18} />
+                    {isTeacher ? 'Teaching Courses' : 'Enrolled Courses'}
+                  </h3>
+                  <div className="profile-courses-list">
+                    {courses.length === 0 ? (
+                      <p style={{ color: '#9CA3AF', padding: '1rem 0' }}>No courses yet.</p>
+                    ) : courses.map((c) => (
+                      <div className="profile-course-row" key={c.id}>
+                        <div className="profile-course-icon profile-course-icon--filled">
+                          <BookOpen size={18} />
+                        </div>
+                        <div className="profile-course-info">
+                          <span className="profile-course-name">{c.subject}</span>
+                          <span className="profile-course-meta">
+                            {c.teacher ? `${c.teacher} · ` : ''}€{c.hourly_price}/hr
+                            {c.level ? ` · ${c.level}` : ''}
+                          </span>
+                        </div>
                       </div>
-                      <div className="profile-review-stars">
-                        {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
-                      </div>
-                      <p className="profile-review-text">{r.text}</p>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+
+                {/* Upcoming Sessions */}
+                <div className="profile-card">
+                  <h3 className="profile-card-title">
+                    <Calendar size={18} />
+                    Sessions
+                  </h3>
+                  <div className="profile-sessions-list">
+                    {sessions.length === 0 ? (
+                      <p style={{ color: '#9CA3AF', padding: '1rem 0' }}>No sessions yet.</p>
+                    ) : sessions.map((s) => {
+                      const d = s.dates ? new Date(s.dates) : null;
+                      return (
+                        <div className="profile-session-row" key={s.id}>
+                          <div className="profile-session-date-block">
+                            <span className="profile-session-day">{d ? d.getDate() : '—'}</span>
+                            <span className="profile-session-month">
+                              {d ? d.toLocaleString('en', { month: 'short' }) : ''}
+                            </span>
+                          </div>
+                          <div className="profile-session-info">
+                            <span className="profile-session-subject">{s.courseName}</span>
+                            <span className="profile-session-meta">
+                              with {s.withName}
+                              {d ? ` · ${d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}` : ''}
+                            </span>
+                          </div>
+                          <span className={`profile-session-state profile-session-state--${(s.state || '').toLowerCase()}`}>
+                            {s.state || 'Unknown'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

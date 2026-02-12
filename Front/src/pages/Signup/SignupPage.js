@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Mail,
   Lock,
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
+import { useAuth } from '../../context/AuthContext';
 
 const PASSWORD_RULES = [
   { key: 'length', label: 'At least 8 characters', test: (v) => v.length >= 8 },
@@ -21,12 +22,17 @@ const PASSWORD_RULES = [
 const SignupPage = memo(function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
+    firstname: '',
     name: '',
     email: '',
     password: '',
+    role: 'Student',
   });
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [error, setError] = useState('');
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const togglePassword = useCallback(() => {
     setShowPassword(prev => !prev);
@@ -37,14 +43,30 @@ const SignupPage = memo(function SignupPage() {
     setForm(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     if (!agreed) return;
+    setError('');
     setLoading(true);
-    // Simulate — will connect to backend later
-    setTimeout(() => setLoading(false), 1500);
-    console.log('Signup:', form);
-  }, [form, agreed]);
+    try {
+      const result = await register({
+        name: form.name,
+        firstname: form.firstname,
+        email: form.email,
+        role: form.role,
+        password: form.password,
+      });
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setError(result.error);
+      }
+    } catch {
+      setError('Something went wrong. Is the backend running?');
+    } finally {
+      setLoading(false);
+    }
+  }, [form, agreed, register, navigate]);
 
   const passwordStrength = PASSWORD_RULES.filter(r => r.test(form.password)).length;
 
@@ -84,23 +106,44 @@ const SignupPage = memo(function SignupPage() {
 
             {/* Form */}
             <form className="auth-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label" htmlFor="signup-name">
-                  Full name
-                </label>
-                <div className="form-input-wrap">
-                  <User size={18} className="form-input-icon" />
-                  <input
-                    id="signup-name"
-                    name="name"
-                    type="text"
-                    placeholder="John Doe"
-                    className="form-input"
-                    value={form.name}
-                    onChange={handleChange}
-                    autoComplete="name"
-                    required
-                  />
+              <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="signup-firstname">
+                    First name
+                  </label>
+                  <div className="form-input-wrap">
+                    <User size={18} className="form-input-icon" />
+                    <input
+                      id="signup-firstname"
+                      name="firstname"
+                      type="text"
+                      placeholder="John"
+                      className="form-input"
+                      value={form.firstname}
+                      onChange={handleChange}
+                      autoComplete="given-name"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="signup-name">
+                    Last name
+                  </label>
+                  <div className="form-input-wrap">
+                    <User size={18} className="form-input-icon" />
+                    <input
+                      id="signup-name"
+                      name="name"
+                      type="text"
+                      placeholder="Doe"
+                      className="form-input"
+                      value={form.name}
+                      onChange={handleChange}
+                      autoComplete="family-name"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -156,9 +199,8 @@ const SignupPage = memo(function SignupPage() {
                   <div className="password-strength">
                     <div className="password-bar">
                       <div
-                        className={`password-bar-fill password-bar--${
-                          passwordStrength <= 1 ? 'weak' : passwordStrength === 2 ? 'medium' : 'strong'
-                        }`}
+                        className={`password-bar-fill password-bar--${passwordStrength <= 1 ? 'weak' : passwordStrength === 2 ? 'medium' : 'strong'
+                          }`}
                         style={{ width: `${(passwordStrength / PASSWORD_RULES.length) * 100}%` }}
                       />
                     </div>
@@ -175,6 +217,24 @@ const SignupPage = memo(function SignupPage() {
                     </ul>
                   </div>
                 )}
+              </div>
+
+              {/* Role selection */}
+              <div className="form-group">
+                <label className="form-label">I am a</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {['Student', 'Teacher'].map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      className={`courses-toolbar-btn ${form.role === r ? 'courses-toolbar-btn--active' : ''}`}
+                      style={{ flex: 1, justifyContent: 'center' }}
+                      onClick={() => setForm(prev => ({ ...prev, role: r }))}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Terms checkbox */}
@@ -207,6 +267,10 @@ const SignupPage = memo(function SignupPage() {
                   </>
                 )}
               </button>
+
+              {error && (
+                <p className="auth-error">{error}</p>
+              )}
             </form>
 
             {/* Footer */}

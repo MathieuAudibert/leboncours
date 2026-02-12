@@ -1,36 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-
-/* ═══════════════════════════════════════
-   DUMMY USERS
-   ═══════════════════════════════════════ */
-const DUMMY_USERS = [
-  {
-    id: 1,
-    name: 'Student',
-    firstname: 'caca1',
-    email: 'caca1@leboncours.fr',
-    role: 'Student',
-    username: 'caca1',
-    password: 'caca1',
-    location: 'Paris, France',
-    joinedAt: '2025-09-15',
-    bio: 'Passionate learner interested in programming, math and languages. Currently studying React and calculus.',
-    stats: { courses: 3, hours: 12, rating: 4.8, reviews: 5 },
-  },
-  {
-    id: 2,
-    name: 'Teacher',
-    firstname: 'caca2',
-    email: 'caca2@leboncours.fr',
-    role: 'Teacher',
-    username: 'caca2',
-    password: 'caca2',
-    location: 'Lyon, France',
-    joinedAt: '2024-06-01',
-    bio: 'Experienced software engineer and educator. Teaching React, TypeScript and Algorithms with 10+ years of industry experience.',
-    stats: { courses: 2, hours: 340, rating: 4.9, reviews: 87 },
-  },
-];
+import { apiLogin, apiRegister } from '../api';
 
 /* ═══════════════════════════════════════
    CONTEXT
@@ -42,28 +11,46 @@ export function AuthProvider({ children }) {
     const saved = sessionStorage.getItem('lbc_user');
     return saved ? JSON.parse(saved) : null;
   });
+  const [token, setToken] = useState(() => {
+    return sessionStorage.getItem('lbc_token') || null;
+  });
 
-  const login = useCallback((username, password) => {
-    const found = DUMMY_USERS.find(
-      (u) => u.username === username && u.password === password
-    );
-    if (found) {
-      // Strip password before storing
-      const { password: _, ...safeUser } = found;
-      setUser(safeUser);
-      sessionStorage.setItem('lbc_user', JSON.stringify(safeUser));
-      return { success: true };
-    }
-    return { success: false, error: 'Invalid username or password.' };
+  const saveSession = useCallback((userData, jwt) => {
+    setUser(userData);
+    setToken(jwt);
+    sessionStorage.setItem('lbc_user', JSON.stringify(userData));
+    sessionStorage.setItem('lbc_token', jwt);
   }, []);
+
+  const login = useCallback(async (email, password) => {
+    try {
+      const res = await apiLogin(email, password);
+      saveSession(res.user, res.token);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Invalid email or password.' };
+    }
+  }, [saveSession]);
+
+  const register = useCallback(async ({ name, firstname, email, role, password }) => {
+    try {
+      const res = await apiRegister({ name, firstname, email, role, password });
+      saveSession(res.user, res.token);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Registration failed.' };
+    }
+  }, [saveSession]);
 
   const logout = useCallback(() => {
     setUser(null);
+    setToken(null);
     sessionStorage.removeItem('lbc_user');
+    sessionStorage.removeItem('lbc_token');
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

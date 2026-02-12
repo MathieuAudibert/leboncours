@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -12,6 +12,7 @@ import {
   Shield,
   Zap,
   ChevronRight,
+  Euro,
 } from 'lucide-react';
 import {
   MdSchool,
@@ -25,6 +26,7 @@ import {
 } from 'react-icons/md';
 import { GoRocket, GoVerified } from 'react-icons/go';
 import { SkeletonCard } from '../../components/SkeletonLoader/SkeletonLoader';
+import { apiListCourses } from '../../api';
 
 
 /* ===== Category Data ===== */
@@ -56,14 +58,6 @@ const STEPS = [
     title: 'Learn & grow',
     desc: 'Join a one-on-one video call and gain practical knowledge instantly.',
   },
-];
-
-/* ===== Stats Data ===== */
-const STATS = [
-  { icon: Users, value: '10k+', label: 'Active Users' },
-  { icon: BookOpen, value: '2.5k+', label: 'Courses Available' },
-  { icon: Star, value: '4.9', label: 'Average Rating' },
-  { icon: Clock, value: '50k+', label: 'Hours of Tutoring' },
 ];
 
 /* ===== Sub-Components ===== */
@@ -102,8 +96,57 @@ const StatItem = memo(function StatItem({ icon: Icon, value, label }) {
   );
 });
 
+/* ===== Featured Course Card ===== */
+const FeaturedCourseCard = memo(function FeaturedCourseCard({ course }) {
+  const levelClass = course.level
+    ? `courses-level courses-level--${course.level.toLowerCase()}`
+    : 'courses-level';
+  return (
+    <Link to="/courses" className="featured-course-card card-hover">
+      <div className="featured-course-top">
+        <span className={levelClass}>{course.level || 'All levels'}</span>
+      </div>
+      <h4 className="featured-course-subject">{course.subject}</h4>
+      <p className="featured-course-desc">
+        {course.description || 'No description available.'}
+      </p>
+      <div className="featured-course-footer">
+        <span className="featured-course-price">
+          <Euro size={14} /> €{course.hourly_price}/hr
+        </span>
+      </div>
+    </Link>
+  );
+});
+
 /* ===== Landing Page ===== */
 export default function LandingPage() {
+  const [courses, setCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiListCourses({ per_page: 4 })
+      .then((res) => {
+        if (!cancelled) setCourses(res.data || []);
+      })
+      .catch(() => {
+        if (!cancelled) setCourses([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingCourses(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  /* Derive live stats from fetched data */
+  const dynamicStats = [
+    { icon: Users, value: '10k+', label: 'Active Users' },
+    { icon: BookOpen, value: courses.length > 0 ? `${courses.length}+` : '—', label: 'Courses Available' },
+    { icon: Star, value: '4.9', label: 'Average Rating' },
+    { icon: Clock, value: '50k+', label: 'Hours of Tutoring' },
+  ];
+
   return (
     <div className="landing">
       {/* ── Hero ── */}
@@ -212,24 +255,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Featured (Skeleton) ── */}
+      {/* ── Featured Courses ── */}
       <section className="section featured-section">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Featured courses</h2>
-            <button className="section-link">
+            <Link to="/courses" className="section-link">
               Browse all <ChevronRight size={16} />
-            </button>
+            </Link>
           </div>
           <div className="featured-grid">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
+            {loadingCourses
+              ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+              : courses.length > 0
+                ? courses.map((c) => <FeaturedCourseCard key={c.id} course={c} />)
+                : Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            }
           </div>
-          <p className="featured-note">
-            <Zap size={14} />
-            Course listings will appear once the backend is connected.
-          </p>
+          {!loadingCourses && courses.length === 0 && (
+            <p className="featured-note">
+              <Zap size={14} />
+              Could not load courses — make sure the backend is running on port 3001.
+            </p>
+          )}
         </div>
       </section>
 
@@ -237,7 +285,7 @@ export default function LandingPage() {
       <section className="section stats-section">
         <div className="container">
           <div className="stats-grid glass-panel">
-            {STATS.map((s) => (
+            {dynamicStats.map((s) => (
               <StatItem key={s.label} {...s} />
             ))}
           </div>
