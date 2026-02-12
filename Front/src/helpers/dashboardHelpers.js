@@ -85,21 +85,6 @@ function buildStudentData(user, allEvents, courseMap, userMap, courseTeacherMap)
 }
 
 /**
- * Derive notifications from sessions.
- */
-export function buildNotifications(sessionsList) {
-  return sessionsList.slice(0, 3).map((s) => ({
-    id: s.id,
-    text: s.state === 'Confirmed'
-      ? `Session "${s.subject}" with ${s.personName} is confirmed.`
-      : s.state === 'Pending'
-        ? `Session "${s.subject}" with ${s.personName} is pending.`
-        : `Session "${s.subject}" status: ${s.state}`,
-    type: s.state === 'Confirmed' ? 'success' : 'reminder',
-  }));
-}
-
-/**
  * Fetch and resolve recent messages for the user.
  */
 export async function fetchMessages(user, userMap, token) {
@@ -152,10 +137,9 @@ export async function fetchDashboardData(user, token, isTeacher) {
     ? buildTeacherData(user, allEvents, tcRes, courseMap, userMap)
     : buildStudentData(user, allEvents, courseMap, userMap, courseTeacherMap);
 
-  const notifications = buildNotifications(sessionsList);
   const messages = await fetchMessages(user, userMap, token);
 
-  return { sessionsList, myCourses, notifications, messages };
+  return { sessionsList, myCourses, messages };
 }
 
 /**

@@ -5,14 +5,11 @@ import {
   Calendar,
   Clock,
   Star,
-  MessageSquare,
   TrendingUp,
   ChevronRight,
   ArrowRight,
-  Bell,
   Video,
   CheckCircle,
-  AlertCircle,
 } from 'lucide-react';
 import { MdSchool } from 'react-icons/md';
 import { GoVerified } from 'react-icons/go';
@@ -35,8 +32,6 @@ const DashboardPage = memo(function DashboardPage() {
 
   const [upcomingSessions, setUpcomingSessions] = useState([]);
   const [myCourses, setMyCourses] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,8 +43,6 @@ const DashboardPage = memo(function DashboardPage() {
         if (cancelled) return;
         setUpcomingSessions(data.sessionsList);
         setMyCourses(data.myCourses);
-        setNotifications(data.notifications);
-        setMessages(data.messages);
       })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -192,59 +185,7 @@ const DashboardPage = memo(function DashboardPage() {
               )}
             </div>
           </div>
-
-          {/* RIGHT COLUMN (Sidebar) */}
-          <aside className="dash-sidebar">
-            {/* Notifications */}
-            <div className="dash-card">
-              <div className="dash-card-header">
-                <h2 className="dash-card-title">
-                  <Bell size={18} />
-                  Notifications
-                </h2>
-              </div>
-              <div className="dash-notif-list">
-                {notifications.length === 0 ? (
-                  <p style={{ color: '#9CA3AF', padding: '0.5rem 0', fontSize: '0.85rem' }}>No notifications.</p>
-                ) : notifications.map((n) => (
-                  <div className="dash-notif-row" key={n.id}>
-                    <div className={`dash-notif-icon ${n.type === 'success' ? 'dash-notif-icon--success' : 'dash-notif-icon--reminder'}`}>
-                      {n.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-                    </div>
-                    <span className="dash-notif-text">{n.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="dash-card">
-              <div className="dash-card-header">
-                <h2 className="dash-card-title">
-                  <MessageSquare size={18} />
-                  Messages
-                </h2>
-              </div>
-              <div className="dash-messages-list">
-                {messages.length === 0 ? (
-                  <p style={{ color: '#9CA3AF', padding: '0.5rem 0', fontSize: '0.85rem' }}>No messages yet.</p>
-                ) : messages.map((msg) => (
-                  <div className="dash-msg-row" key={msg.id}>
-                    <div className="dash-msg-avatar">
-                      {msg.sender.split(' ').map(w => w[0]).join('')}
-                    </div>
-                    <div className="dash-msg-body">
-                      <div className="dash-msg-header">
-                        <span className="dash-msg-sender">{msg.sender}</span>
-                        <span className="dash-msg-time">{msg.time}</span>
-                      </div>
-                      <span className="dash-msg-preview">{msg.preview}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+          <aside>
             {/* Quick Calendar */}
             <div className="dash-card">
               <div className="dash-card-header">

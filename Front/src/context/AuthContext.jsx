@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { apiLogin, apiRegister } from '../api';
+import { apiLogin, apiRegister, apiUpdateUser } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -39,6 +39,14 @@ export function AuthProvider({ children }) {
     }
   }, [saveSession]);
 
+  const updateUser = useCallback(async (fields) => {
+    const res = await apiUpdateUser(user.id, fields, token);
+    const updated = { ...user, ...fields, ...(res?.user || {}) };
+    setUser(updated);
+    sessionStorage.setItem('lbc_user', JSON.stringify(updated));
+    return updated;
+  }, [user, token]);
+
   const logout = useCallback(() => {
     setUser(null);
     setToken(null);
@@ -47,7 +55,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, login, register, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

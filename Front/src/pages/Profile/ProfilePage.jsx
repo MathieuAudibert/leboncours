@@ -6,6 +6,7 @@ import {
   Calendar,
   Clock,
   Edit3,
+  X,
 } from 'lucide-react';
 import { MdVerified } from 'react-icons/md';
 import { useAuth } from '../../context/AuthContext';
@@ -23,10 +24,14 @@ const EmptyState = ({ loading, label }) => (
 );
 
 const ProfilePage = memo(function ProfilePage() {
-  const { user, token } = useAuth();
+  const { user, token, updateUser } = useAuth();
   const [courses, setCourses] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
+  const [editForm, setEditForm] = useState({ firstname: '', name: '', email: '' });
+  const [editError, setEditError] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -133,7 +138,15 @@ const ProfilePage = memo(function ProfilePage() {
             <div className="profile-card">
               <div className="profile-name-row">
                 <h2 className="profile-real-name">{user.firstname} {user.name}</h2>
-                <button className="profile-edit-btn" title="Edit profile">
+                <button
+                  className="profile-edit-btn"
+                  title="Edit profile"
+                  onClick={() => {
+                    setEditForm({ firstname: user.firstname || '', name: user.name || '', email: user.email || '' });
+                    setEditError('');
+                    setShowEdit(true);
+                  }}
+                >
                   <Edit3 size={15} />
                 </button>
               </div>
@@ -252,6 +265,72 @@ const ProfilePage = memo(function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* ── Edit Profile Modal ── */}
+      {showEdit && (
+        <div className="profile-modal-overlay" onClick={() => setShowEdit(false)}>
+          <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="profile-modal-header">
+              <h3>Edit Profile</h3>
+              <button className="profile-modal-close" onClick={() => setShowEdit(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <form
+              className="profile-modal-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setSaving(true);
+                setEditError('');
+                try {
+                  await updateUser(editForm);
+                  setShowEdit(false);
+                } catch (err) {
+                  setEditError(err.message || 'Update failed.');
+                } finally {
+                  setSaving(false);
+                }
+              }}
+            >
+              <label className="profile-modal-label">
+                First name
+                <input
+                  className="profile-modal-input"
+                  value={editForm.firstname}
+                  onChange={(e) => setEditForm((f) => ({ ...f, firstname: e.target.value }))}
+                  required
+                />
+              </label>
+              <label className="profile-modal-label">
+                Last name
+                <input
+                  className="profile-modal-input"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                  required
+                />
+              </label>
+              <label className="profile-modal-label">
+                Email
+                <input
+                  className="profile-modal-input"
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+                  required
+                />
+              </label>
+
+              {editError && <p className="profile-modal-error">{editError}</p>}
+
+              <button className="profile-modal-submit" type="submit" disabled={saving}>
+                {saving ? 'Saving...' : 'Save'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 });
