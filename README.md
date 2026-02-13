@@ -1,204 +1,215 @@
-# le-bon-cours
-Leboncours is a Single Page Application (SPA) where users can sign up as either "Mentors" (who offer skills) or "Students" (who book sessions). It bridges the gap between casual learning and professional tutoring by allowing quick, one-off booking of video call sessions for specific skills (e.g., "Code Review", "Guitar Tuning", "French Basics").
+# Leboncours
 
-Project Name: "Leboncours"
+A Single Page Application (SPA) where users can sign up as **Teachers** or **Students**. Teachers offer courses with availability slots, and students can browse and book sessions. The platform also includes an admin role, a messaging system, and a dashboard with charts.
 
-Tagline: A decentralized marketplace for micro-tutoring sessions.
+## Tech Stack
 
-Core Value: Speed, Simplicity, and Professional Management.
-1. Full Tech Stack Specification
-Backend (The Engine)
+### Backend
 
-    Language: Rust (Stable)
+- **Language:** Rust (Edition 2024)
+- **Framework:** Axum 0.7
+- **Async Runtime:** Tokio
+- **ORM:** SeaORM 1.1 (PostgreSQL via sqlx)
+- **API Docs:** Utoipa + Swagger UI
+- **Auth:** Argon2 (password hashing) + JWT (jsonwebtoken)
+- **Validation:** validator
+- **CORS:** tower-http
 
-    Framework: Axum (Chosen for high performance, modularity, and excellent integration with the Tokio async runtime).
+### Database
 
-    ORM: SeaORM.
+- **System:** PostgreSQL
+- **Schema management:** Raw SQL (`db/create_table.sql`)
 
-    API Documentation: Utoipa (Generates OpenAPI/Swagger JSON directly from Rust structs/enums).
+### Frontend
 
-    Authentication: Argon2 + JWT (JSON Web Tokens).
+- **Framework:** React 19 (Create React App)
+- **Language:** JavaScript (JSX)
+- **Routing:** react-router-dom 7
+- **Data Grid:** AG Grid React 35
+- **Charts:** Recharts
+- **Icons:** Lucide React, React Icons
+- **HTTP Client:** Native `fetch` (custom wrapper in `src/api.js`)
+- **Auth State:** React Context (`AuthContext`) with `sessionStorage`
 
-Database
+## Database Schema
 
-    System: PostgreSQL 15+
+### Enums
 
-    Management: SeaORM CLI (for migrations and entity generation).
+- `users_role`: `Teacher`, `Admin`, `Student`
+- `event_state`: `Pending`, `Confirmed`, `Canceled`, `Done`
 
-Frontend
+### Tables
 
-    Framework: React 18+ (using Vite).
-
-    Language: TypeScript (Strict mode).
-
-    Data Grid: Ag Grid React.
-
-    State Management: TanStack Query (React Query).
-
-    Styling: Tailwind CSS.
-
-    HTTP Client: Axios.
-
-1. User Stories & Functional Requirements
-
-Role A: The Mentor
-
-    Create Profile: Set display name, bio, and hourly rate.
-
-    List Skills: Create "Skill Cards" (e.g., "Rust Async Programming").
-
-    Manage Bookings (Ag Grid): View a sortable, filterable table of incoming requests. Use grid controls to bulk-accept or reject sessions.
-
-Role B: The Student
-
-    Search & Browse: View a grid of available skills/mentors.
-
-    Book Session: Select a skill and submit a request.
-
-    My Bookings (Ag Grid): A personal dashboard table showing past and upcoming sessions, filterable by date or status.
-
-3. Database Schema & SeaORM Integration
-
-Table 1: users
-
-    id: UUID (Primary Key)
-
-    username: String (Unique)
-
-    email: String (Unique)
-
-    password: String
-
-    role: Enum ('mentor', 'student')
-
-    SeaORM Relation: HasMany skills, HasMany bookings.
-
-Table 2: skills
-
-    id: UUID (Primary Key)
-
-    mentor_id: UUID (Foreign Key -> users.id)
-
-    title: String
-
-    description: Text
-
-    price: Decimal
-
-    SeaORM Relation: BelongsTo users.
-
-Table 3: bookings
-
-    id: UUID (Primary Key)
-
-    student_id: UUID (Foreign Key -> users.id)
-
-    skill_id: UUID (Foreign Key -> skills.id)
-
-    scheduled_time: DateTimeUtc
-
-    status: Enum ('pending', 'confirmed', 'rejected')
-
-    SeaORM Relation: BelongsTo users (Student), BelongsTo skills.
-
-4. API Design & Swagger Integration
+| Table | Columns | Notes |
+|-------|---------|-------|
+| **Users** | `id` SERIAL PK, `name`, `firstname`, `email`, `role` (users_role), `password`, `metadata` JSONB | |
+| **Courses** | `id` SERIAL PK, `subject`, `hourly_price` INT, `level`, `description` TEXT | |
+| **Availabilities** | `id` SERIAL PK, `start_date` DATE, `end_date` DATE, `start_time` TIMESTAMP, `end_time` TIMESTAMP, `course_id` FK→Courses | |
+| **TeacherCourses** | `id` SERIAL PK, `teacher_id` FK→Users, `course_id` FK→Courses | Join table |
+| **EventCourses** | `id` SERIAL PK, `student_id` FK→Users, `course_id` FK→Courses, `dates` TIMESTAMP, `state` (event_state) | Bookings |
+| **Messages** | `id` SERIAL PK, `created_at` TIMESTAMP, `content` TEXT | |
+| **MessagesUsers** | `id` SERIAL PK, `sender_id` FK→Users, `receiver_id` FK→Users, `message_id` FK→Messages (CASCADE) | |
 
 ## API Endpoints
+
+Base URL: `http://127.0.0.1:3001`
 
 ### Auth
 | Method | Path | Description |
 |--------|------|-------------|
+| POST | `/api/auth/register` | Register new user, returns JWT |
 | POST | `/api/auth/login` | Login, returns JWT |
-| POST | `/api/auth/register` | Register new user |
 
 ### Users
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/users` | List users (filter: role, name, email) |
+| POST | `/api/users/create` | Create user |
+| GET | `/api/users/all` | List all users |
 | GET | `/api/users/:id` | Get user by ID |
-| POST | `/api/users` | Create user |
-| PUT | `/api/users/:id` | Update user |
-| DELETE | `/api/users/:id` | Delete user |
+| PUT | `/api/users/edit/:id` | Update user |
+| DELETE | `/api/users/delete/:id` | Delete user |
 
 ### Courses
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/courses` | List courses (filter: subject, level, price range) |
-| GET | `/api/courses/:id` | Get course details |
-| POST | `/api/courses` | Create course |
-| PUT | `/api/courses/:id` | Update course |
-| DELETE | `/api/courses/:id` | Delete course |
+| POST | `/api/courses/create` | Create course |
+| GET | `/api/courses/all` | List courses (filter: subject, level, price range, pagination) |
+| GET | `/api/courses/:id` | Get course by ID |
+| PUT | `/api/courses/edit/:id` | Update course |
+| DELETE | `/api/courses/delete/:id` | Delete course |
 
 ### Availabilities
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/availabilities` | List slots (filter: courseId, date range) |
-| GET | `/api/availabilities/:id` | Get slot by ID |
-| POST | `/api/availabilities` | Create availability slot |
-| PUT | `/api/availabilities/:id` | Update slot |
-| DELETE | `/api/availabilities/:id` | Delete slot |
+| POST | `/api/availabilities/create` | Create availability slot |
+| GET | `/api/availabilities/all` | List availabilities |
+| GET | `/api/availabilities/:id` | Get availability by ID |
+| PUT | `/api/availabilities/edit/:id` | Update availability |
+| DELETE | `/api/availabilities/delete/:id` | Delete availability |
 
 ### EventCourses (Bookings)
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/event-courses` | List bookings (filter: studentId, state) |
-| GET | `/api/event-courses/:id` | Get booking details |
-| POST | `/api/event-courses` | Create booking (student books a course) |
-| PUT | `/api/event-courses/:id` | Update state (Pending→Confirmed→Done) |
-| DELETE | `/api/event-courses/:id` | Cancel booking |
+| POST | `/api/event-courses/create` | Create booking |
+| GET | `/api/event-courses/all` | List bookings |
+| GET | `/api/event-courses/:id` | Get booking by ID |
+| PUT | `/api/event-courses/edit/:id` | Update booking |
+| DELETE | `/api/event-courses/delete/:id` | Delete booking |
 
 ### TeacherCourses
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/teacher-courses` | List teacher-course assignments |
+| POST | `/api/teacher-courses/create` | Assign teacher to course |
+| GET | `/api/teacher-courses/all` | List assignments |
 | GET | `/api/teacher-courses/:id` | Get assignment by ID |
-| POST | `/api/teacher-courses` | Assign teacher to course |
-| DELETE | `/api/teacher-courses/:id` | Remove assignment |
+| PUT | `/api/teacher-courses/edit/:id` | Update assignment |
+| DELETE | `/api/teacher-courses/delete/:id` | Remove assignment |
 
 ### Messages
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/messages` | List messages |
+| POST | `/api/messages/create` | Create message |
+| GET | `/api/messages/all` | List messages |
 | GET | `/api/messages/:id` | Get message by ID |
-| POST | `/api/messages` | Send message (creates message + messageUsers) |
-| DELETE | `/api/messages/:id` | Delete message |
+| PUT | `/api/messages/edit/:id` | Update message |
+| DELETE | `/api/messages/delete/:id` | Delete message |
 
 ### MessageUsers
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/message-users` | List (filter: senderId, receiverId, userId) |
+| POST | `/api/message-users/create` | Create message-user link |
+| GET | `/api/message-users/all` | List message-user links |
 | GET | `/api/message-users/:id` | Get by ID |
+| PUT | `/api/message-users/edit/:id` | Update |
+| DELETE | `/api/message-users/delete/:id` | Delete |
 
 ### Docs
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/swagger-ui` | Interactive API documentation |
+| GET | `/swagger-ui` | Interactive Swagger UI |
 
-5. UI/UX Concept
-Public Pages (Landing & Search)
+## Frontend Pages
 
-    Layout: Clean, card-based layout using Tailwind CSS.
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Landing | Hero banner, features, how-it-works sections |
+| `/about` | About | Team & project info |
+| `/login` | Login | Email + password authentication |
+| `/signup` | Signup | Registration (name, firstname, email, role, password) |
+| `/courses` | Courses | Browse & filter courses (AG Grid) |
+| `/profile` | Profile | View/edit user profile |
+| `/dashboard` | Dashboard | Stats & charts (Recharts) |
 
-    Visuals: Hero banner, search bar, and a grid of "Skill Cards".
+## Project Structure
 
-Private Dashboard (The "Ag Grid" Power View)
+```
+Back/
+├── main.rs              # Entry point, DB init, server launch
+├── database.rs          # PostgreSQL connection (SeaORM)
+├── server.rs            # Axum server setup, CORS, Swagger UI
+├── server/
+│   ├── api_routes.rs    # All route definitions
+│   └── fn_path.rs       # OpenAPI doc & home handler
+├── api/
+│   ├── auth/            # Register, Login, JWT
+│   ├── users/           # CRUD handlers + DTOs
+│   ├── courses/         # CRUD handlers + DTOs
+│   ├── availabilities/  # CRUD handlers + DTOs
+│   ├── eventCourses/    # CRUD handlers + DTOs
+│   ├── teacherCourses/  # CRUD handlers + DTOs
+│   ├── messages/        # CRUD handlers + DTOs
+│   ├── messageUsers/    # CRUD handlers + DTOs
+│   ├── common/          # Enums, pagination, password utils
+│   └── error.rs         # Unified error handling
+└── entities/            # SeaORM generated entities
 
-    Mentor Dashboard:
+Front/
+├── src/
+│   ├── App.jsx          # Routes & layout (Navbar + Footer)
+│   ├── api.js           # All API calls (fetch wrapper)
+│   ├── index.jsx        # React entry point
+│   ├── context/         # AuthContext (login, register, logout)
+│   ├── components/      # Navbar, Footer, PageLoader, Charts, etc.
+│   ├── pages/           # Landing, About, Login, Signup, Courses, Profile, Dashboard
+│   ├── css/             # CSS modules (variables, components, pages)
+│   └── helpers/         # Chart & dashboard helper functions
+└── public/
 
-        Instead of a simple list, a full-width Ag Grid table.
+db/
+├── create_table.sql     # Schema creation
+└── insert.sql           # Seed data
+```
 
-        Columns: Student Name, Skill Requested, Date, Price, Status, Actions.
+## Getting Started
 
-        Features:
+### Prerequisites
 
-            Quick Filter: A text box to instantly search for a specific student name.
+- Rust (Edition 2024)
+- PostgreSQL
+- Node.js
 
-            Status Renderer: Custom cell renderer showing colorful badges for "Pending" vs "Confirmed".
+### Backend
 
-            Action Cell: Buttons inside the grid row to "Approve" or "Deny".
+```bash
+cd Back
+# Set DATABASE_URL and JWT_SECRET in .env
+cargo run
+# Server runs on http://127.0.0.1:3001
+# Swagger UI at http://127.0.0.1:3001/swagger-ui/
+```
 
-    Student Dashboard:
+### Frontend
 
-        Ag Grid table showing Skill Name, Mentor, Date, Status.
+```bash
+cd Front
+npm install
+npm start
+# App runs on http://localhost:3000
+```
 
-        Features: Sort by "Date" to see upcoming sessions first.
+### Database
+
+```bash
+psql -U <user> -d <dbname> -f db/create_table.sql
+psql -U <user> -d <dbname> -f db/insert.sql
+```
