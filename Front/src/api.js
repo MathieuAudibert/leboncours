@@ -192,6 +192,14 @@ export async function apiCreateEventCourse(data, token) {
     });
 }
 
+export async function apiUpdateEventCourse(id, data, token) {
+    return request(`/api/event-courses/edit/${id}`, {
+        method: 'PUT',
+        body: data,
+        token,
+    });
+}
+
 export async function apiListAvailabilities(params = {}, token) {
     const query = new URLSearchParams();
     if (params.course_id) {

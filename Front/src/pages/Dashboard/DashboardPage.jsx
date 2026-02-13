@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
   BookOpen,
@@ -10,10 +10,12 @@ import {
   ArrowRight,
   Video,
   CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { MdSchool } from 'react-icons/md';
 import { GoVerified } from 'react-icons/go';
 import { useAuth } from '../../context/AuthContext';
+import { apiUpdateEventCourse } from '../../api';
 import DashboardCharts from '../../components/DashboardCharts/DashboardCharts';
 import { fetchDashboardData, buildStats } from '../../helpers/dashboardHelpers';
 
@@ -49,6 +51,17 @@ function DashboardPage() {
 
     return () => { cancelled = true; };
   }, [user, token, isTeacher]);
+
+  const handleSessionAction = useCallback(async (sessionId, newState) => {
+    try {
+      await apiUpdateEventCourse(sessionId, { state: newState }, token);
+      setUpcomingSessions((prev) =>
+        prev.map((s) => (s.id === sessionId ? { ...s, state: newState } : s))
+      );
+    } catch {
+      /* silently fail */
+    }
+  }, [token]);
 
   const stats = useMemo(() => {
     return buildStats(isTeacher, myCourses, upcomingSessions).map((s) => ({
@@ -136,9 +149,28 @@ function DashboardPage() {
                           </span>
                         </div>
                         <StateTag state={session.state} />
-                        <button className="dash-session-join-btn" title="Join session">
-                          <Video size={16} />
-                        </button>
+                        {isTeacher && session.state === 'Pending' ? (
+                          <div className="dash-session-actions">
+                            <button
+                              className="dash-session-action-btn dash-session-action-btn--confirm"
+                              title="Confirm session"
+                              onClick={() => handleSessionAction(session.id, 'Confirmed')}
+                            >
+                              <CheckCircle size={16} />
+                            </button>
+                            <button
+                              className="dash-session-action-btn dash-session-action-btn--cancel"
+                              title="Cancel session"
+                              onClick={() => handleSessionAction(session.id, 'Canceled')}
+                            >
+                              <XCircle size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button className="dash-session-join-btn" title="Join session">
+                            <Video size={16} />
+                          </button>
+                        )}
                       </div>
                     );
                   })}

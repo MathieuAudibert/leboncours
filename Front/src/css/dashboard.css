@@ -295,6 +295,47 @@
   transform: scale(1.05);
 }
 
+/* ── Session Actions (teacher confirm/cancel) ── */
+.dash-session-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dash-session-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.dash-session-action-btn:hover {
+  transform: scale(1.1);
+}
+
+.dash-session-action-btn--confirm {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.dash-session-action-btn--confirm:hover {
+  background: #bbf7d0;
+}
+
+.dash-session-action-btn--cancel {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.dash-session-action-btn--cancel:hover {
+  background: #fecaca;
+}
+
 /* ── Courses ── */
 .dash-courses-list {
   display: flex;
