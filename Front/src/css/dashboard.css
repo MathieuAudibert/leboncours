@@ -1,6 +1,3 @@
-/* ═══════════════════════════════════
-   DASHBOARD PAGE
-   ═══════════════════════════════════ */
 
 .dash-page {
   padding: 40px 0 80px;
@@ -587,10 +584,6 @@
   border-radius: 50%;
   background: var(--color-primary);
 }
-
-/* ═══════════════════════════════════
-   DASHBOARD CHARTS
-   ═══════════════════════════════════ */
 
 .dash-charts {
   margin-bottom: 32px;

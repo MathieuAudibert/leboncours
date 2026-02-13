@@ -1,7 +1,3 @@
-/* ═══════════════════════════════════
-   PROFILE PAGE
-   ═══════════════════════════════════ */
-
 .profile-page {
   padding: 0 0 80px;
   background: var(--color-background);
@@ -563,10 +559,6 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
-
-/* ═══════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════ */
 
 @media (max-width: 900px) {
   .profile-layout {

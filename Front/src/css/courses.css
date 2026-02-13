@@ -1,6 +1,3 @@
-/* ═══════════════════════════════════
-   COURSES PAGE
-   ═══════════════════════════════════ */
 
 /* ── Page ── */
 .courses-page {
@@ -422,11 +419,6 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
 }
-
-/* ═══════════════════════════════════
-   BOOKING MODAL
-   ═══════════════════════════════════ */
-
 /* Overlay */
 .booking-overlay {
   position: fixed;
@@ -703,10 +695,6 @@
   color: var(--color-text-secondary);
 }
 
-/* ═══════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════ */
-
 @media (max-width: 768px) {
   .courses-page {
     padding: 32px 0 64px;
@@ -786,10 +774,6 @@
     justify-content: center;
   }
 }
-
-/* ═══════════════════════════════════
-   CREATE COURSE MODAL (Teacher)
-   ═══════════════════════════════════ */
 
 /* "New Course" button in toolbar */
 .courses-toolbar-btn--create {

@@ -171,3 +171,7 @@ Continue: "Continue to iterate?"
 
 put our whole conversation (without the files, actually for each files put [attached file]) in a file so I can copy paste it
 
+
+
+## User message 7
+Make the front end more bright in blue.

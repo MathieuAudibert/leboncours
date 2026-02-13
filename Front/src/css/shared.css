@@ -1,7 +1,3 @@
-/* ═══════════════════════════════════
-   SHARED / REUSABLE STYLES
-   ═══════════════════════════════════ */
-
 /* ── Animations ── */
 @keyframes skeleton-pulse {
   0% { opacity: 1; }

@@ -1,7 +1,3 @@
-/* ═══════════════════════════════════
-   FOOTER
-   ═══════════════════════════════════ */
-
 .footer {
   background: var(--color-surface);
   border-top: 1px solid #D2D2D7;
@@ -117,10 +113,6 @@
   color: var(--color-primary);
   background: var(--color-primary-light);
 }
-
-/* ═══════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════ */
 
 @media (max-width: 768px) {
   .footer {

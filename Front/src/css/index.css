@@ -1,8 +1,3 @@
-/* ═══════════════════════════════════
-   MAIN CSS ENTRY POINT
-   Import order matters: tokens → reset → shared → components → layout → pages
-   ═══════════════════════════════════ */
-
 @import './variables.css';
 @import './reset.css';
 @import './shared.css';
