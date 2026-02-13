@@ -360,7 +360,6 @@ function CoursesPage() {
   const isLogin = !!user;
   const gridRef = useRef(null);
   const [quickFilter, setQuickFilter] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [courses, setCourses] = useState([]);
@@ -486,20 +485,8 @@ function CoursesPage() {
     },
   ], []);
 
-  const defaultColDef = useMemo(() => ({
-    sortable: true,
-    resizable: true,
-    filter: true,
-    floatingFilter: showFilters,
-    suppressHeaderMenuButton: false,
-  }), [showFilters]);
-
   const handleQuickFilterChange = useCallback((e) => {
     setQuickFilter(e.target.value);
-  }, []);
-
-  const toggleFilters = useCallback(() => {
-    setShowFilters(prev => !prev);
   }, []);
 
   // Stats derived from real data
@@ -560,14 +547,6 @@ function CoursesPage() {
                 <span>New Course</span>
               </button>
             )}
-            <button
-              className={`courses-toolbar-btn ${showFilters ? 'courses-toolbar-btn--active' : ''}`}
-              onClick={toggleFilters}
-              title="Toggle column filters"
-            >
-              <SlidersHorizontal size={16} />
-              <span>Filters</span>
-            </button>
           </div>
         </div>
 
@@ -577,7 +556,6 @@ function CoursesPage() {
             ref={gridRef}
             rowData={courses}
             columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
             quickFilterText={quickFilter}
             pagination={true}
             paginationPageSize={10}

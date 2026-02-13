@@ -219,31 +219,6 @@
   margin-top: 4px;
 }
 
-.password-bar {
-  height: 4px;
-  background: var(--color-border);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-}
-
-.password-bar-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  transition: width var(--transition-base), background var(--transition-base);
-}
-
-.password-bar--weak {
-  background: var(--color-error);
-}
-
-.password-bar--medium {
-  background: var(--color-warning);
-}
-
-.password-bar--strong {
-  background: var(--color-success);
-}
-
 .password-rules {
   display: flex;
   flex-direction: column;
