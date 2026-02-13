@@ -15,8 +15,6 @@ import { useAuth } from '../../context/AuthContext';
 
 const PASSWORD_RULES = [
   { key: 'length', label: 'At least 8 characters', test: (v) => v.length >= 8 },
-  { key: 'upper', label: 'One uppercase letter', test: (v) => /[A-Z]/.test(v) },
-  { key: 'number', label: 'One number', test: (v) => /\d/.test(v) },
 ];
 
 function SignupPage() {
@@ -198,23 +196,7 @@ function SignupPage() {
                 {form.password.length > 0 && (
                   <div className="password-strength">
                     <div className="password-bar">
-                      <div
-                        className={`password-bar-fill password-bar--${passwordStrength <= 1 ? 'weak' : passwordStrength === 2 ? 'medium' : 'strong'
-                          }`}
-                        style={{ width: `${(passwordStrength / PASSWORD_RULES.length) * 100}%` }}
-                      />
                     </div>
-                    <ul className="password-rules">
-                      {PASSWORD_RULES.map(rule => (
-                        <li
-                          key={rule.key}
-                          className={`password-rule ${rule.test(form.password) ? 'password-rule--pass' : ''}`}
-                        >
-                          <CheckCircle2 size={14} />
-                          <span>{rule.label}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 )}
               </div>
