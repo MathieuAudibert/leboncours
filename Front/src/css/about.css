@@ -4,7 +4,7 @@
 
 /* ── Hero ── */
 .about-hero {
-  padding: 80px 0 60px;
+  padding: 100px 0 80px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   text-align: center;
@@ -18,10 +18,10 @@
 }
 
 .about-hero-title {
-  font-size: 48px;
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -1.5px;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   color: var(--color-text);
 }
 
@@ -30,9 +30,9 @@
 }
 
 .about-hero-subtitle {
-  font-size: 18px;
+  font-size: 21px;
   color: var(--color-text-secondary);
-  line-height: 1.7;
+  line-height: 1.38;
   max-width: 560px;
 }
 
@@ -43,7 +43,7 @@
 
 .mission-card {
   text-align: center;
-  padding: 56px 48px;
+  padding: 64px 48px;
   border-radius: var(--radius-xl);
   max-width: 780px;
   margin: 0 auto;
@@ -62,8 +62,8 @@
 }
 
 .mission-title {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 700;
   margin-bottom: 16px;
 }
 
@@ -92,7 +92,7 @@
 
 .value-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: var(--value-color, var(--color-primary));
 }
 
@@ -110,7 +110,7 @@
 
 .value-title {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
@@ -122,9 +122,7 @@
 
 /* ── Timeline ── */
 .about-timeline {
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--color-section-alt);
 }
 
 .timeline {
@@ -171,7 +169,7 @@
 
 .timeline-title {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
@@ -203,7 +201,7 @@
 
 .tech-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: var(--tech-color);
 }
 
@@ -213,7 +211,7 @@
 
 .tech-name {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .tech-desc {

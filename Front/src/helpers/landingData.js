@@ -11,14 +11,14 @@ import {
 } from 'react-icons/md';
 
 export const CATEGORIES = [
-  { name: 'Programming', icon: MdCode, color: '#3B82F6', count: 234 },
-  { name: 'Music', icon: MdMusicNote, color: '#8B5CF6', count: 187 },
-  { name: 'Languages', icon: MdTranslate, color: '#10B981', count: 312 },
-  { name: 'Mathematics', icon: MdCalculate, color: '#F59E0B', count: 156 },
-  { name: 'Science', icon: MdScience, color: '#EF4444', count: 98 },
-  { name: 'Art & Design', icon: MdBrush, color: '#EC4899', count: 145 },
-  { name: 'Academics', icon: MdSchool, color: '#6366F1', count: 203 },
-  { name: 'Fitness', icon: MdFitnessCenter, color: '#14B8A6', count: 76 },
+  { name: 'Programming', icon: MdCode, color: '#0071E3', count: 234 },
+  { name: 'Music', icon: MdMusicNote, color: '#AF52DE', count: 187 },
+  { name: 'Languages', icon: MdTranslate, color: '#34C759', count: 312 },
+  { name: 'Mathematics', icon: MdCalculate, color: '#FF9F0A', count: 156 },
+  { name: 'Science', icon: MdScience, color: '#FF3B30', count: 98 },
+  { name: 'Art & Design', icon: MdBrush, color: '#FF2D55', count: 145 },
+  { name: 'Academics', icon: MdSchool, color: '#5856D6', count: 203 },
+  { name: 'Fitness', icon: MdFitnessCenter, color: '#30D158', count: 76 },
 ];
 
 export const STEPS = [

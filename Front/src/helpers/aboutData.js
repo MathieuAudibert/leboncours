@@ -8,37 +8,37 @@ export const VALUES = [
     icon: Zap,
     title: 'Speed',
     desc: 'Instant session booking. No bureaucracy, no delays — just connect and learn.',
-    color: '#F59E0B',
+    color: '#FF9F0A',
   },
   {
     icon: MdHandshake,
     title: 'Simplicity',
     desc: 'A clean interface that makes finding the right mentor effortless.',
-    color: '#3B82F6',
+    color: '#0071E3',
   },
   {
     icon: Shield,
     title: 'Trust',
     desc: 'Verified mentors, transparent reviews, and secure payments.',
-    color: '#10B981',
+    color: '#34C759',
   },
   {
     icon: MdDiversity3,
     title: 'Diversity',
     desc: 'Hundreds of skills from programming to music to languages and beyond.',
-    color: '#8B5CF6',
+    color: '#AF52DE',
   },
   {
     icon: Globe,
     title: 'Accessibility',
     desc: 'Learn from anywhere via video calls. No location limits.',
-    color: '#14B8A6',
+    color: '#30D158',
   },
   {
     icon: MdSpeed,
     title: 'Performance',
     desc: 'Built with Rust on the backend for blazing-fast response times.',
-    color: '#EF4444',
+    color: '#FF3B30',
   },
 ];
 

@@ -129,7 +129,7 @@ export default function LandingPage() {
                 <div className="hero-card-skill">Rust & Systems</div>
               </div>
               <div className="hero-card-rating">
-                <Star size={14} fill="#F59E0B" stroke="#F59E0B" />
+                <Star size={14} fill="#FF9F0A" stroke="#FF9F0A" />
                 <span>4.9</span>
               </div>
             </div>

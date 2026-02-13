@@ -25,9 +25,9 @@
 }
 
 .dash-name {
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -0.8px;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   color: var(--color-text);
 }
 
@@ -82,7 +82,7 @@
 
 .dash-stat-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .dash-stat-icon {
@@ -100,7 +100,7 @@
 .dash-stat-value {
   display: block;
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-text);
   letter-spacing: -0.5px;
 }
@@ -142,7 +142,7 @@
   align-items: center;
   gap: 8px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -215,7 +215,7 @@
 
 .dash-session-day {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-primary);
   line-height: 1;
 }
@@ -236,7 +236,7 @@
 .dash-session-subject {
   display: block;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -258,21 +258,21 @@
 }
 
 .dash-state--confirmed {
-  color: #059669;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #1B9E4B;
+  background: rgba(52, 199, 89, 0.1);
+  border: 1px solid rgba(52, 199, 89, 0.25);
 }
 
 .dash-state--pending {
-  color: #d97706;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #CC7F00;
+  background: rgba(255, 159, 10, 0.1);
+  border: 1px solid rgba(255, 159, 10, 0.25);
 }
 
 .dash-state--canceled {
-  color: #dc2626;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #D63030;
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.25);
 }
 
 .dash-session-join-btn {
@@ -291,7 +291,7 @@
 }
 
 .dash-session-join-btn:hover {
-  background: var(--color-primary-hover);
+  opacity: 0.85;
   transform: scale(1.05);
 }
 
@@ -319,21 +319,21 @@
 }
 
 .dash-session-action-btn--confirm {
-  background: #dcfce7;
-  color: #16a34a;
+  background: rgba(52, 199, 89, 0.15);
+  color: #1B9E4B;
 }
 
 .dash-session-action-btn--confirm:hover {
-  background: #bbf7d0;
+  background: rgba(52, 199, 89, 0.25);
 }
 
 .dash-session-action-btn--cancel {
-  background: #fee2e2;
-  color: #dc2626;
+  background: rgba(255, 59, 48, 0.15);
+  color: #D63030;
 }
 
 .dash-session-action-btn--cancel:hover {
-  background: #fecaca;
+  background: rgba(255, 59, 48, 0.25);
 }
 
 /* ── Courses ── */
@@ -379,7 +379,7 @@
 .dash-course-name {
   display: block;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -395,14 +395,14 @@
   align-items: center;
   gap: 4px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
   flex-shrink: 0;
 }
 
 .dash-course-progress-text {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-primary);
   flex-shrink: 0;
   min-width: 36px;
@@ -422,7 +422,7 @@
   height: 100%;
   background: var(--color-primary);
   border-radius: var(--radius-full);
-  transition: width 500ms ease;
+  transition: width 500ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* ── Empty state ── */
@@ -466,13 +466,13 @@
 }
 
 .dash-notif-icon--success {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
+  background: rgba(52, 199, 89, 0.1);
+  color: #1B9E4B;
 }
 
 .dash-notif-icon--reminder {
-  background: rgba(245, 158, 11, 0.1);
-  color: #d97706;
+  background: rgba(255, 159, 10, 0.1);
+  color: #CC7F00;
 }
 
 .dash-notif-text {
@@ -612,7 +612,7 @@
 
 .dash-chart-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 .dash-chart-header {
@@ -625,7 +625,7 @@
 
 .dash-chart-title {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -719,7 +719,7 @@
   }
 
   .dash-name {
-    font-size: 24px;
+    font-size: 32px;
   }
 
   .dash-header-actions {

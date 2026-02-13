@@ -39,11 +39,11 @@ function DashboardCharts({ isTeacher, sessions, courses }) {
                     render: () => (
                         <ResponsiveContainer width="100%" height={220}>
                             <BarChart data={sessionsPerDay} barSize={28}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
-                                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" vertical={false} />
+                                <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#86868B' }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fontSize: 12, fill: '#86868B' }} axisLine={false} tickLine={false} allowDecimals={false} />
                                 <Tooltip content={<ChartTooltip />} />
-                                <Bar dataKey="sessions" name="Sessions" fill="#2d5a8c" radius={[6, 6, 0, 0]} />
+                                <Bar dataKey="sessions" name="Sessions" fill="#0071E3" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     ),
@@ -74,7 +74,7 @@ function DashboardCharts({ isTeacher, sessions, courses }) {
                                     verticalAlign="bottom"
                                     iconType="circle"
                                     iconSize={8}
-                                    wrapperStyle={{ fontSize: 12, color: '#6B7280' }}
+                                    wrapperStyle={{ fontSize: 12, color: '#86868B' }}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
@@ -91,11 +91,11 @@ function DashboardCharts({ isTeacher, sessions, courses }) {
                 render: () => (
                     <ResponsiveContainer width="100%" height={220}>
                         <BarChart data={sessionsPerDay} barSize={28}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
-                            <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-                            <YAxis tick={{ fontSize: 12, fill: '#9CA3AF' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.08)" vertical={false} />
+                            <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#86868B' }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fontSize: 12, fill: '#86868B' }} axisLine={false} tickLine={false} allowDecimals={false} />
                             <Tooltip content={<ChartTooltip />} />
-                            <Bar dataKey="sessions" name="Sessions" fill="#2d5a8c" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey="sessions" name="Sessions" fill="#0071E3" radius={[6, 6, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 ),
@@ -126,7 +126,7 @@ function DashboardCharts({ isTeacher, sessions, courses }) {
                                 verticalAlign="bottom"
                                 iconType="circle"
                                 iconSize={8}
-                                wrapperStyle={{ fontSize: 12, color: '#6B7280' }}
+                                wrapperStyle={{ fontSize: 12, color: '#86868B' }}
                             />
                         </PieChart>
                     </ResponsiveContainer>

@@ -4,9 +4,9 @@
 
 .footer {
   background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  padding: 64px 0 0;
-  margin-top: 80px;
+  border-top: 1px solid #D2D2D7;
+  padding: 24px 0 0;
+  margin-top: 0;
 }
 
 .footer-grid {
@@ -24,7 +24,7 @@
 }
 
 .footer-tagline {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--color-text-secondary);
   line-height: 1.7;
   margin-bottom: 20px;
@@ -39,7 +39,7 @@
 
 /* Sections */
 .footer-heading {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--color-text);
   text-transform: uppercase;
@@ -54,7 +54,7 @@
 }
 
 .footer-link {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--color-text-secondary);
   transition: color var(--transition-fast);
   cursor: pointer;
@@ -78,13 +78,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 0;
-  margin-top: 48px;
-  border-top: 1px solid var(--color-border);
+  padding: 12px 0;
+  margin-top: 16px;
+  border-top: 1px solid #D2D2D7;
 }
 
 .footer-copy {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-muted);
   display: flex;
   align-items: center;
@@ -105,9 +105,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-lg);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   color: var(--color-text-secondary);
   background: var(--color-background);
   transition: all var(--transition-fast);
@@ -124,7 +124,7 @@
 
 @media (max-width: 768px) {
   .footer {
-    padding: 48px 0 0;
+    padding: 24px 0 0;
   }
 
   .footer-grid {

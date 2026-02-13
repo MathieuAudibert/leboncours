@@ -8,7 +8,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 17px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -19,7 +19,7 @@ body {
   font-family: var(--font-family);
   color: var(--color-text);
   background-color: var(--color-background);
-  line-height: 1.6;
+  line-height: 1.47;
   min-height: 100vh;
 }
 
@@ -50,27 +50,27 @@ input, textarea {
 
 /* ===== Focus ===== */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: 4px solid rgba(0, 113, 227, 0.4);
+  outline-offset: 1px;
   border-radius: var(--radius-sm);
 }
 
 /* ===== Scrollbar ===== */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-border-light);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-text-muted);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* ===== Layout ===== */
@@ -89,7 +89,7 @@ input, textarea {
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 22px;
 }
 
 /* ===== Screen Reader ===== */

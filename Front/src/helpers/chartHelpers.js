@@ -1,10 +1,10 @@
 export const COLORS = [
-    '#2d5a8c',
-    '#10B981',
-    '#F59E0B',
-    '#EF4444',
-    '#8B5CF6',
-    '#EC4899',
+    '#0071E3',
+    '#34C759',
+    '#FF9F0A',
+    '#FF3B30',
+    '#AF52DE',
+    '#FF2D55',
 ];
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
