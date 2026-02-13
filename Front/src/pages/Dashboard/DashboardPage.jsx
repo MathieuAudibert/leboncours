@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
   BookOpen,
@@ -19,14 +19,14 @@ import { fetchDashboardData, buildStats } from '../../helpers/dashboardHelpers';
 
 const ICON_MAP = { BookOpen, Calendar, Clock, Star, TrendingUp, CheckCircle };
 
-const StateTag = memo(function StateTag({ state }) {
+function StateTag({ state }) {
   const cls = state === 'Confirmed' ? 'dash-state--confirmed' :
     state === 'Pending' ? 'dash-state--pending' :
       state === 'Canceled' ? 'dash-state--canceled' : '';
   return <span className={`dash-state ${cls}`}>{state}</span>;
-});
+}
 
-const DashboardPage = memo(function DashboardPage() {
+function DashboardPage() {
   const { user, token } = useAuth();
   const isTeacher = user?.role === 'Teacher';
 
@@ -189,6 +189,6 @@ const DashboardPage = memo(function DashboardPage() {
       </div>
     </div>
   );
-});
+}
 
 export default DashboardPage;

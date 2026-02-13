@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   Mail,
@@ -23,7 +23,7 @@ const EmptyState = ({ loading, label }) => (
   </p>
 );
 
-const ProfilePage = memo(function ProfilePage() {
+function ProfilePage() {
   const { user, token, updateUser } = useAuth();
   const [courses, setCourses] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -333,6 +333,6 @@ const ProfilePage = memo(function ProfilePage() {
       )}
     </div>
   );
-});
+}
 
 export default ProfilePage;

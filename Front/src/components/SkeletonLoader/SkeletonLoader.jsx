@@ -1,7 +1,7 @@
-import React, { memo } from 'react';
+import React from 'react';
 
 
-const SkeletonLoader = memo(function SkeletonLoader({
+function SkeletonLoader({
   width = '100%',
   height = '20px',
   borderRadius = 'var(--radius-md)',
@@ -20,9 +20,9 @@ const SkeletonLoader = memo(function SkeletonLoader({
       aria-hidden="true"
     />
   );
-});
+}
 
-export const SkeletonCard = memo(function SkeletonCard() {
+export function SkeletonCard() {
   return (
     <div className="skeleton-card">
       <SkeletonLoader height="160px" borderRadius="var(--radius-lg) var(--radius-lg) 0 0" />
@@ -37,6 +37,6 @@ export const SkeletonCard = memo(function SkeletonCard() {
       </div>
     </div>
   );
-});
+}
 
 export default SkeletonLoader;

@@ -1,10 +1,9 @@
-import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { SiRust, SiReact, SiPostgresql } from 'react-icons/si';
 import { GraduationCap } from 'lucide-react';
 
 
-const Footer = memo(function Footer() {
+function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -37,6 +36,6 @@ const Footer = memo(function Footer() {
       </div>
     </footer>
   );
-});
+}
 
 export default Footer;

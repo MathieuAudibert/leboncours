@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
     BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -26,7 +26,7 @@ function ChartTooltip({ active, payload, label }) {
     );
 }
 
-const DashboardCharts = memo(function DashboardCharts({ isTeacher, sessions, courses }) {
+function DashboardCharts({ isTeacher, sessions, courses }) {
     const charts = useMemo(() => {
         const sessionsPerDay = buildSessionsPerDay(sessions);
         const courseDist = buildCourseDistribution(courses);
@@ -152,6 +152,6 @@ const DashboardCharts = memo(function DashboardCharts({ isTeacher, sessions, cou
             </div>
         </div>
     );
-});
+}
 
 export default DashboardCharts;

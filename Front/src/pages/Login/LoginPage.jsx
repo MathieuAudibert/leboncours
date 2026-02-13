@@ -1,11 +1,11 @@
-import React, { memo, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn, GraduationCap } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../context/AuthContext';
 
-const LoginPage = memo(function LoginPage() {
+function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -193,6 +193,6 @@ const LoginPage = memo(function LoginPage() {
       </div>
     </div>
   );
-});
+}
 
 export default LoginPage;

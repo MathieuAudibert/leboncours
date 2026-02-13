@@ -1,10 +1,10 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { Target, ArrowRight } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import { VALUES, TIMELINE, TECH } from '../../helpers/aboutData';
 
 /* ===== Sub-Components ===== */
-const ValueCard = memo(function ValueCard({ icon: Icon, title, desc, color }) {
+function ValueCard({ icon: Icon, title, desc, color }) {
   return (
     <div className="value-card" style={{ '--value-color': color }}>
       <div className="value-icon-wrap">
@@ -14,9 +14,9 @@ const ValueCard = memo(function ValueCard({ icon: Icon, title, desc, color }) {
       <p className="value-desc">{desc}</p>
     </div>
   );
-});
+}
 
-const TimelineItem = memo(function TimelineItem({ icon: Icon, title, desc, index }) {
+function TimelineItem({ icon: Icon, title, desc, index }) {
   return (
     <div className="timeline-item">
       <div className="timeline-marker">
@@ -31,7 +31,7 @@ const TimelineItem = memo(function TimelineItem({ icon: Icon, title, desc, index
       </div>
     </div>
   );
-});
+}
 
 /* ===== About Page ===== */
 export default function AboutPage() {
@@ -66,23 +66,6 @@ export default function AboutPage() {
               to a language enthusiast sharing conversation practice. No semester-long commitments.
               Just fast, focused, one-on-one sessions.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Values ── */}
-      <section className="section about-values">
-        <div className="container">
-          <div className="section-header section-header--center">
-            <h2 className="section-title">What drives us</h2>
-            <p className="section-subtitle">
-              Six core values that shape everything we build
-            </p>
-          </div>
-          <div className="values-grid">
-            {VALUES.map((v) => (
-              <ValueCard key={v.title} {...v} />
-            ))}
           </div>
         </div>
       </section>
@@ -129,25 +112,6 @@ export default function AboutPage() {
               <FaGithub size={18} />
               View on GitHub
             </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="section about-cta">
-        <div className="container">
-          <div className="cta-card">
-            <h2 className="cta-title">Join the community</h2>
-            <p className="cta-subtitle">
-              Whether you want to learn a new skill or share your expertise,
-              leboncours is the place for you.
-            </p>
-            <div className="cta-actions">
-              <button className="btn btn--primary btn--lg">
-                Get Started
-                <ArrowRight size={18} />
-              </button>
-            </div>
           </div>
         </div>
       </section>

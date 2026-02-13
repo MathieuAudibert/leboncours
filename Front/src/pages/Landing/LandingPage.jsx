@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -14,7 +14,7 @@ import { apiListCourses } from '../../api';
 import { CATEGORIES, STEPS } from '../../helpers/landingData';
 
 /* ===== Sub-Components ===== */
-const CategoryCard = memo(function CategoryCard({ name, icon: Icon, color, count }) {
+function CategoryCard({ name, icon: Icon, color, count }) {
   return (
     <button className="category-card" style={{ '--cat-color': color }}>
       <div className="category-icon-wrap">
@@ -24,9 +24,9 @@ const CategoryCard = memo(function CategoryCard({ name, icon: Icon, color, count
       <span className="category-count">{count} courses</span>
     </button>
   );
-});
+}
 
-const StepCard = memo(function StepCard({ icon: Icon, title, desc, index }) {
+function StepCard({ icon: Icon, title, desc, index }) {
   return (
     <div className="step-card">
       <div className="step-number">{index + 1}</div>
@@ -37,10 +37,10 @@ const StepCard = memo(function StepCard({ icon: Icon, title, desc, index }) {
       <p className="step-desc">{desc}</p>
     </div>
   );
-});
+}
 
 /* ===== Featured Course Card ===== */
-const FeaturedCourseCard = memo(function FeaturedCourseCard({ course }) {
+function FeaturedCourseCard({ course }) {
   const levelClass = course.level
     ? `courses-level courses-level--${course.level.toLowerCase()}`
     : 'courses-level';
@@ -60,7 +60,7 @@ const FeaturedCourseCard = memo(function FeaturedCourseCard({ course }) {
       </div>
     </Link>
   );
-});
+}
 
 /* ===== Landing Page ===== */
 export default function LandingPage() {

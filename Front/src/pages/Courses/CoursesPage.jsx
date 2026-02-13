@@ -1,4 +1,4 @@
-import { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -16,11 +16,13 @@ import {
   Euro,
   MessageSquare,
   CheckCircle,
+  LogIn,
   Plus,
   FileText,
   GraduationCap,
   Tag,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   apiListCourses,
@@ -229,7 +231,7 @@ function CreateCourseModal({ onClose, onCreated }) {
 
 function BookingModal({ course, onClose, onBooked }) {
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedTime, setSelectedTime] = useState(' PM');
   const [message, setMessage] = useState('');
   const [booked, setBooked] = useState(false);
 
@@ -352,9 +354,10 @@ function BookingModal({ course, onClose, onBooked }) {
   );
 }
 
-const CoursesPage = memo(function CoursesPage() {
+function CoursesPage() {
   const { user, token } = useAuth();
   const isTeacher = user?.role === 'Teacher';
+  const isLogin = !!user;
   const gridRef = useRef(null);
   const [quickFilter, setQuickFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -525,7 +528,6 @@ const CoursesPage = memo(function CoursesPage() {
             </p>
           </div>
 
-          {/* Quick stats */}
           <div className="courses-stats-row">
             <div className="courses-stat-chip">
               <span className="courses-stat-chip-value">{stats.total}</span>
@@ -609,11 +611,31 @@ const CoursesPage = memo(function CoursesPage() {
 
       {/* Booking Modal */}
       {selectedCourse && (
-        <BookingModal
-          course={selectedCourse}
-          onClose={() => setSelectedCourse(null)}
-          onBooked={handleBookSession}
-        />
+        isLogin ? (
+          <BookingModal
+            course={selectedCourse}
+            onClose={() => setSelectedCourse(null)}
+            onBooked={handleBookSession}
+          />
+        ) : (
+          <div className="booking-overlay">
+            <div className="booking-modal" >
+              <div className="booking-header" style={{ textAlign: 'center' }}>
+                <h2 className="booking-title">You're not logged in</h2>
+                <p className="booking-desc">Please log in or create an account to book a session.</p>
+              </div>
+              <div className="booking-actions">
+                <button className="btn btn--outline booking-cancel-btn" onClick={() => setSelectedCourse(null)}>
+                  Cancel
+                </button>
+                <Link to="/login" className="btn btn--primary booking-book-btn">
+                  <LogIn size={16} />
+                  Log in
+                </Link>
+              </div>
+            </div>
+          </div>
+        )
       )}
 
       {/* Create Course Modal (Teachers only) */}
@@ -625,6 +647,6 @@ const CoursesPage = memo(function CoursesPage() {
       )}
     </div>
   );
-});
+}
 
 export default CoursesPage;

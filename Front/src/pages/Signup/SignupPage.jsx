@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Mail,
@@ -19,7 +19,7 @@ const PASSWORD_RULES = [
   { key: 'number', label: 'One number', test: (v) => /\d/.test(v) },
 ];
 
-const SignupPage = memo(function SignupPage() {
+function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     firstname: '',
@@ -302,10 +302,6 @@ const SignupPage = memo(function SignupPage() {
               </div>
               <div className="auth-visual-feature">
                 <CheckCircle2 size={18} />
-                <span>Cancel anytime</span>
-              </div>
-              <div className="auth-visual-feature">
-                <CheckCircle2 size={18} />
                 <span>500+ verified mentors</span>
               </div>
             </div>
@@ -314,6 +310,6 @@ const SignupPage = memo(function SignupPage() {
       </div>
     </div>
   );
-});
+}
 
 export default SignupPage;

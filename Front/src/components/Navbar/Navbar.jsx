@@ -1,10 +1,10 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, Menu, X, User, LogIn, GraduationCap, LayoutDashboard, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 
-const Navbar = memo(function Navbar() {
+function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -167,6 +167,6 @@ const Navbar = memo(function Navbar() {
       )}
     </nav>
   );
-});
+}
 
 export default Navbar;
