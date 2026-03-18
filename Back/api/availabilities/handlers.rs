@@ -108,8 +108,10 @@ pub async fn list_availabilities(
     query = query.order_by_asc(Column::StartDate);
 
     let paginator = query.paginate(&state.db, per_page);
-    let total = paginator.num_items().await?;
-    let items = paginator.fetch_page(page - 1).await?;
+    let (total, items) = tokio::try_join!(
+        paginator.num_items(),
+        paginator.fetch_page(page - 1)
+    )?;
 
     let data: Vec<AvailabilityResponse> = items.into_iter().map(AvailabilityResponse::from).collect();
 

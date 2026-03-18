@@ -7,7 +7,10 @@ pub async fn connect() -> DatabaseConnection {
 
     let mut opt = ConnectOptions::new(db_url);
     opt.max_connections(10)
-        .connect_timeout(Duration::from_secs(5));
+        .min_connections(2)
+        .connect_timeout(Duration::from_secs(5))
+        .idle_timeout(Duration::from_secs(600))
+        .acquire_timeout(Duration::from_secs(10));
 
     println!("Connecting to the database");
     Database::connect(opt).await.expect("Cannot connect to DB")

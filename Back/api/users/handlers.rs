@@ -114,8 +114,10 @@ pub async fn list(
 
     // Paginate
     let paginator = query.paginate(&state.db, per_page);
-    let total = paginator.num_items().await?;
-    let items = paginator.fetch_page(page - 1).await?;
+    let (total, items) = tokio::try_join!(
+        paginator.num_items(),
+        paginator.fetch_page(page - 1)
+    )?;
 
     let data: Vec<UserResponse> = items.into_iter().map(UserResponse::from).collect();
 

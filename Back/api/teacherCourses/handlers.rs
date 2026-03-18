@@ -91,8 +91,10 @@ pub async fn list_teacher_courses(
     query = query.order_by_asc(Column::Id);
 
     let paginator = query.paginate(&state.db, per_page);
-    let total = paginator.num_items().await?;
-    let items = paginator.fetch_page(page - 1).await?;
+    let (total, items) = tokio::try_join!(
+        paginator.num_items(),
+        paginator.fetch_page(page - 1)
+    )?;
 
     let data: Vec<TeacherCourseResponse> = items.into_iter().map(TeacherCourseResponse::from).collect();
 

@@ -83,8 +83,10 @@ pub async fn list_messages(
     let query = Entity::find().order_by_desc(Column::CreatedAt);
 
     let paginator = query.paginate(&state.db, per_page);
-    let total = paginator.num_items().await?;
-    let items = paginator.fetch_page(page - 1).await?;
+    let (total, items) = tokio::try_join!(
+        paginator.num_items(),
+        paginator.fetch_page(page - 1)
+    )?;
 
     let data: Vec<MessageResponse> = items.into_iter().map(MessageResponse::from).collect();
 
