@@ -1,114 +1,55 @@
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
+INSERT INTO Users (name, firstname, email, role, password, metadata) VALUES
+('Admin', 'System', 'admin@edu.com', 'Admin', 'hash123', '{"bio": "Lead Admin", "created_at": "2026-01-01", "updated_at": "2026-01-01"}'),
+('Vinci', 'Leo', 'leo@edu.com', 'Teacher', 'hash123', '{"bio": "Art & Math Guru", "created_at": "2026-01-02", "updated_at": "2026-01-02"}'),
+('Curie', 'Marie', 'marie@edu.com', 'Teacher', 'hash123', '{"bio": "Science Lead", "created_at": "2026-01-02", "updated_at": "2026-01-05"}'),
+('Turing', 'Alan', 'alan@edu.com', 'Teacher', 'hash123', '{"bio": "CS Pioneer", "created_at": "2026-01-03", "updated_at": "2026-01-03"}'),
+('Smith', 'Alice', 'alice@stud.com', 'Student', 'hash123', '{"bio": "Biology student", "created_at": "2026-01-10", "updated_at": "2026-01-10"}'),
+('Jones', 'Bob', 'bob@stud.com', 'Student', 'hash123', '{"bio": "Loves History", "created_at": "2026-01-10", "updated_at": "2026-01-10"}'),
+('Brown', 'Charlie', 'charlie@stud.com', 'Student', 'hash123', '{"bio": "Aspiring Artist", "created_at": "2026-01-11", "updated_at": "2026-01-11"}'),
+('Davis', 'Diana', 'diana@stud.com', 'Student', 'hash123', '{"bio": "Physics major", "created_at": "2026-01-11", "updated_at": "2026-01-11"}'),
+('Evans', 'Edward', 'ed@stud.com', 'Student', 'hash123', '{"bio": "CS freshman", "created_at": "2026-01-12", "updated_at": "2026-01-12"}'),
+('Foster', 'Fiona', 'fiona@stud.com', 'Student', 'hash123', '{"bio": "Math enthusiast", "created_at": "2026-01-12", "updated_at": "2026-01-12"}'),
+('Garcia', 'Gabe', 'gabe@stud.com', 'Student', 'hash123', '{"bio": "Student", "created_at": "2026-01-13", "updated_at": "2026-01-13"}'),
+('Harris', 'Helen', 'helen@stud.com', 'Student', 'hash123', '{"bio": "Student", "created_at": "2026-01-13", "updated_at": "2026-01-13"}'),
+('Ivanov', 'Igor', 'igor@stud.com', 'Student', 'hash123', '{"bio": "Student", "created_at": "2026-01-14", "updated_at": "2026-01-14"}'),
+('Kim', 'Kevin', 'kevin@stud.com', 'Student', 'hash123', '{"bio": "Student", "created_at": "2026-01-14", "updated_at": "2026-01-14"}'),
+('Lopez', 'Laura', 'laura@stud.com', 'Student', 'hash123', '{"bio": "Student", "created_at": "2026-01-15", "updated_at": "2026-01-15"}');
 
--- Applying triggers to tables
-CREATE TRIGGER update_users_modtime BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-CREATE TRIGGER update_skills_modtime BEFORE UPDATE ON skills FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-CREATE TRIGGER update_bookings_modtime BEFORE UPDATE ON bookings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+INSERT INTO Courses (subject, hourly_price, level, description) VALUES
+('Calculus', 50, 'Advanced', 'Limits and Derivatives'),
+('Physics I', 45, 'Beginner', 'Classical Mechanics'),
+('Art History', 30, 'Intermediate', 'The Renaissance'),
+('Python 101', 55, 'Beginner', 'Intro to Scripting'),
+('Philosophy', 35, 'Intermediate', 'Logic and Ethics');
 
--- View for Mentor Profiles
-CREATE VIEW view_mentor_profiles AS
-SELECT 
-    u.id as mentor_id,
-    u.username,
-    u.email,
-    s.id as skill_id,
-    s.title,
-    s.price,
-    s.is_active
-FROM users u
-JOIN skills s ON u.id = s.mentor_id
-WHERE u.role = 'mentor';
+INSERT INTO TeacherCourses (teacher_id, course_id) VALUES
+(2, 1), (2, 3), (3, 2), (4, 4), (3, 5);
 
--- View for Detailed Bookings
-CREATE VIEW view_booking_details AS
-SELECT 
-    b.id as booking_id,
-    stu.username as student_name,
-    men.username as mentor_name,
-    s.title as skill_title,
-    b.scheduled_time,
-    b.status
-FROM bookings b
-JOIN users stu ON b.student_id = stu.id
-JOIN skills s ON b.skill_id = s.id
-JOIN users men ON s.mentor_id = men.id;
+INSERT INTO Availabilities (start_date, end_date, start_time, end_time, course_id) VALUES
+('2026-02-01', '2026-02-01', '2026-02-01 09:00:00', '2026-02-01 11:00:00', 1),
+('2026-02-01', '2026-02-01', '2026-02-01 14:00:00', '2026-02-01 16:00:00', 2),
+('2026-02-02', '2026-02-02', '2026-02-02 10:00:00', '2026-02-02 12:00:00', 3),
+('2026-02-03', '2026-02-03', '2026-02-03 09:00:00', '2026-02-03 11:00:00', 4),
+('2026-02-04', '2026-02-04', '2026-02-04 13:00:00', '2026-02-04 15:00:00', 5);
 
--- Inserting Users (5 Mentors, 5 Students)
-INSERT INTO users (username, email, password_hash, role, bio) VALUES
-('dev_guru', 'alex@example.com', 'hash_123', 'mentor', 'Full-stack dev with 10 years experience.'),
-('design_pro', 'sarah@example.com', 'hash_123', 'mentor', 'UI/UX Designer at a top tech firm.'),
-('data_wiz', 'chen@example.com', 'hash_123', 'mentor', 'Data Scientist specializing in Python and ML.'),
-('biz_coach', 'elena@example.com', 'hash_123', 'mentor', 'Entrepreneur and startup consultant.'),
-('sql_master', 'postgres_fan@example.com', 'hash_123', 'mentor', 'DBA and query optimization expert.'),
-('student_amy', 'amy@example.com', 'hash_456', 'student', 'Looking to learn React.'),
-('student_bob', 'bob@example.com', 'hash_456', 'student', 'Interested in career coaching.'),
-('student_claire', 'claire@example.com', 'hash_456', 'student', 'Beginner in Python.'),
-('student_dan', 'dan@example.com', 'hash_456', 'student', 'Wants to improve Figma skills.'),
-('student_eric', 'eric@example.com', 'hash_456', 'student', 'Deep dive into SQL.');
+INSERT INTO EventCourses (student_id, course_id, dates, state) VALUES
+(5, 2, '2026-02-10 10:00:00', 'Confirmed'),
+(6, 3, '2026-02-11 14:00:00', 'Pending'),
+(7, 3, '2026-02-11 14:00:00', 'Confirmed'),
+(8, 1, '2026-02-12 09:00:00', 'Done'),
+(9, 4, '2026-02-13 11:00:00', 'Confirmed'),
+(10, 1, '2026-02-14 09:00:00', 'Canceled'),
+(11, 5, '2026-02-15 13:00:00', 'Confirmed'),
+(12, 4, '2026-02-16 11:00:00', 'Pending'),
+(13, 2, '2026-02-17 10:00:00', 'Confirmed'),
+(14, 1, '2026-02-18 09:00:00', 'Done');
 
--- Inserting Skills for Mentors
-INSERT INTO skills (mentor_id, title, description, price)
-SELECT id, 'Advanced React Patterns', 'Learn hooks, context, and performance.', 50.00 FROM users WHERE username = 'dev_guru';
-INSERT INTO skills (mentor_id, title, description, price)
-SELECT id, 'Node.js Backend Architecture', 'Scalable systems with Express.', 65.00 FROM users WHERE username = 'dev_guru';
-INSERT INTO skills (mentor_id, title, description, price)
-SELECT id, 'Figma Masterclass', 'Design systems and prototyping.', 45.00 FROM users WHERE username = 'design_pro';
-INSERT INTO skills (mentor_id, title, description, price)
-SELECT id, 'Introduction to Pandas', 'Data manipulation for beginners.', 40.00 FROM users WHERE username = 'data_wiz';
-INSERT INTO skills (mentor_id, title, description, price)
-SELECT id, 'Machine Learning Basics', 'Scikit-learn and linear regression.', 75.00 FROM users WHERE username = 'data_wiz';
-INSERT INTO skills (mentor_id, title, description, price)
-SELECT id, 'Pitching to VCs', 'How to raise your first seed round.', 120.00 FROM users WHERE username = 'biz_coach';
-INSERT INTO skills (mentor_id, title, description, price)
-SELECT id, 'PostgreSQL Optimization', 'Explain analyze and indexing.', 90.00 FROM users WHERE username = 'sql_master';
+INSERT INTO Messages (created_at, content) VALUES
+('2026-01-20 08:00:00', 'Welcome to the Calculus course!'),
+('2026-01-20 10:30:00', 'Is there any required reading for Art History?'),
+('2026-01-21 09:15:00', 'The Python lab is moved to Room 4.'),
+('2026-01-22 14:00:00', 'Can I join the Philosophy session late?'),
+('2026-01-23 16:45:00', 'Grade for Physics has been posted.');
 
--- Inserting Bookings
-INSERT INTO bookings (student_id, skill_id, scheduled_time, status, notes)
-SELECT 
-    (SELECT id FROM users WHERE username = 'student_amy'),
-    (SELECT id FROM skills WHERE title = 'Advanced React Patterns'),
-    NOW() + INTERVAL '2 days',
-    'confirmed',
-    'I want to focus on UseMemo and UseCallback.';
-
-INSERT INTO bookings (student_id, skill_id, scheduled_time, status, notes)
-SELECT 
-    (SELECT id FROM users WHERE username = 'student_bob'),
-    (SELECT id FROM skills WHERE title = 'Pitching to VCs'),
-    NOW() + INTERVAL '5 days',
-    'pending',
-    'Have a deck ready to review.';
-
-INSERT INTO bookings (student_id, skill_id, scheduled_time, status, notes)
-SELECT 
-    (SELECT id FROM users WHERE username = 'student_claire'),
-    (SELECT id FROM skills WHERE title = 'Introduction to Pandas'),
-    NOW() - INTERVAL '1 day',
-    'completed',
-    'Great session!';
-
-INSERT INTO bookings (student_id, skill_id, scheduled_time, status, notes)
-SELECT 
-    (SELECT id FROM users WHERE username = 'student_dan'),
-    (SELECT id FROM skills WHERE title = 'Figma Masterclass'),
-    NOW() + INTERVAL '3 days',
-    'confirmed',
-    'Need help with auto-layout.';
-
-INSERT INTO bookings (student_id, skill_id, scheduled_time, status, notes)
-SELECT 
-    (SELECT id FROM users WHERE username = 'student_eric'),
-    (SELECT id FROM skills WHERE title = 'PostgreSQL Optimization'),
-    NOW() + INTERVAL '1 week',
-    'rejected',
-    'Mentor is on vacation.';
-
--- Additional 100+ lines of varied data patterns could be added here to stress test, 
--- but these blocks cover the essential functional logic and a diverse testing base.
-
+INSERT INTO MessagesUsers (sender_id, receiver_id, message_id) VALUES
+(2, 8, 1), (6, 2, 2), (4, 9, 3), (11, 3, 4), (3, 5, 5);

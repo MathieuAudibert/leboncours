@@ -1,0 +1,25 @@
+[package]
+name = "WebArchi"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name="WebArchi"
+path="./main.rs"
+
+[dependencies]
+axum = "0.7.9"
+tokio = { version = "1.41", features = ["full"] }
+utoipa = { version = "5.2.0", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "8.0.3", features = ["axum"] }
+dotenvy = "0.15.7"
+sea-orm = { version = "1.1.0", features = [ "runtime-tokio-rustls", "sqlx-postgres", "macros" ] }
+argon2 = "0.5"
+
+serde = { version = "1.0.228", features = ["derive"] }
+validator = { version = "0.20.0", features = ["derive"] }
+tracing = "0.1.44"
+chrono = "0.4"
+jsonwebtoken = "9"
+serde_json = "1"
+tower-http = { version = "0.5", features = ["cors"] }

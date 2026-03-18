@@ -1,0 +1,226 @@
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import {
+  BookOpen,
+  Calendar,
+  Clock,
+  Star,
+  TrendingUp,
+  ChevronRight,
+  ArrowRight,
+  Video,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react';
+import { MdSchool } from 'react-icons/md';
+import { GoVerified } from 'react-icons/go';
+import { useAuth } from '../../context/AuthContext';
+import { apiUpdateEventCourse } from '../../api';
+import DashboardCharts from '../../components/DashboardCharts/DashboardCharts';
+import { fetchDashboardData, buildStats } from '../../helpers/dashboardHelpers';
+
+const ICON_MAP = { BookOpen, Calendar, Clock, Star, TrendingUp, CheckCircle };
+
+function StateTag({ state }) {
+  const cls = state === 'Confirmed' ? 'dash-state--confirmed' :
+    state === 'Pending' ? 'dash-state--pending' :
+      state === 'Canceled' ? 'dash-state--canceled' : '';
+  return <span className={`dash-state ${cls}`}>{state}</span>;
+}
+
+function DashboardPage() {
+  const { user, token } = useAuth();
+  const isTeacher = user?.role === 'Teacher';
+
+  const [upcomingSessions, setUpcomingSessions] = useState([]);
+  const [myCourses, setMyCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    fetchDashboardData(user, token, isTeacher)
+      .then((data) => {
+        if (cancelled) return;
+        setUpcomingSessions(data.sessionsList);
+        setMyCourses(data.myCourses);
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [user, token, isTeacher]);
+
+  const handleSessionAction = useCallback(async (sessionId, newState) => {
+    try {
+      await apiUpdateEventCourse(sessionId, { state: newState }, token);
+      setUpcomingSessions((prev) =>
+        prev.map((s) => (s.id === sessionId ? { ...s, state: newState } : s))
+      );
+    } catch {
+      /* silently fail */
+    }
+  }, [token]);
+
+  const stats = useMemo(() => {
+    return buildStats(isTeacher, myCourses, upcomingSessions).map((s) => ({
+      ...s,
+      icon: ICON_MAP[s.icon] || BookOpen,
+    }));
+  }, [isTeacher, myCourses, upcomingSessions]);
+
+  if (!user) return <Navigate to="/login" replace />;
+
+  return (
+    <div className="dash-page">
+      <div className="container">
+        {/* Welcome Header */}
+        <div className="dash-header">
+          <div className="dash-header-text">
+            <p className="dash-greeting">Welcome back,</p>
+            <h1 className="dash-name">{user.firstname} {user.name}</h1>
+            <div className="dash-role-tag">
+              {isTeacher ? <MdSchool size={14} /> : <BookOpen size={14} />}
+              <span>{user.role}</span>
+              <GoVerified size={14} className="dash-verified" />
+            </div>
+          </div>
+          <div className="dash-header-actions">
+            <Link to="/courses" className="btn btn--outline dash-header-btn">
+              <BookOpen size={16} />
+              Browse Courses
+            </Link>
+            <Link to="/profile" className="btn btn--primary dash-header-btn">
+              <ArrowRight size={16} />
+              My Profile
+            </Link>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="dash-stats-row">
+          {stats.map((s) => (
+            <div className="dash-stat-card" key={s.label}>
+              <div className="dash-stat-icon">
+                <s.icon size={20} />
+              </div>
+              <div>
+                <span className="dash-stat-value">{s.value}</span>
+                <span className="dash-stat-label">{s.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts */}
+        <DashboardCharts isTeacher={isTeacher} sessions={upcomingSessions} courses={myCourses} />
+
+        <div className="dash-grid">
+          {/* LEFT COLUMN */}
+          <div className="dash-main">
+            {/* Upcoming Sessions */}
+            <div className="dash-card">
+              <div className="dash-card-header">
+                <h2 className="dash-card-title">
+                  <Calendar size={18} />
+                  Sessions
+                </h2>
+                <span className="dash-card-count">{upcomingSessions.length}</span>
+              </div>
+              {loading ? (
+                <p style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>Loading...</p>
+              ) : (
+                <div className="dash-sessions-list">
+                  {upcomingSessions.map((session) => {
+                    const d = session.dates ? new Date(session.dates) : null;
+                    return (
+                      <div className="dash-session-row" key={session.id}>
+                        <div className="dash-session-date-block">
+                          <span className="dash-session-day">{d ? d.getDate() : '—'}</span>
+                          <span className="dash-session-month">{d ? d.toLocaleString('en', { month: 'short' }) : ''}</span>
+                        </div>
+                        <div className="dash-session-info">
+                          <span className="dash-session-subject">{session.subject}</span>
+                          <span className="dash-session-meta">
+                            {session.personLabel}: {session.personName}
+                            {d ? ` · ${d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}` : ''}
+                            {session.level ? ` · ${session.level}` : ''}
+                          </span>
+                        </div>
+                        <StateTag state={session.state} />
+                        {isTeacher && session.state === 'Pending' ? (
+                          <div className="dash-session-actions">
+                            <button
+                              className="dash-session-action-btn dash-session-action-btn--confirm"
+                              title="Confirm session"
+                              onClick={() => handleSessionAction(session.id, 'Confirmed')}
+                            >
+                              <CheckCircle size={16} />
+                            </button>
+                            <button
+                              className="dash-session-action-btn dash-session-action-btn--cancel"
+                              title="Cancel session"
+                              onClick={() => handleSessionAction(session.id, 'Canceled')}
+                            >
+                              <XCircle size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button className="dash-session-join-btn" title="Join session">
+                            <Video size={16} />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {!loading && upcomingSessions.length === 0 && (
+                <p className="dash-empty">No sessions yet. <Link to="/courses">Browse courses</Link></p>
+              )}
+            </div>
+
+            {/* Courses */}
+            <div className="dash-card">
+              <div className="dash-card-header">
+                <h2 className="dash-card-title">
+                  <BookOpen size={18} />
+                  {isTeacher ? 'My Teaching Courses' : 'Enrolled Courses'}
+                </h2>
+                <Link to="/courses" className="dash-card-link">
+                  See all <ChevronRight size={14} />
+                </Link>
+              </div>
+
+              {loading ? (
+                <p style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>Loading...</p>
+              ) : (
+                <div className="dash-courses-list">
+                  {myCourses.length === 0 ? (
+                    <p className="dash-empty">No courses yet. <Link to="/courses">Browse courses</Link></p>
+                  ) : myCourses.map((course) => (
+                    <div className="dash-course-row" key={course.id}>
+                      <div className="dash-course-icon-wrap">
+                        {isTeacher ? <MdSchool size={20} /> : <BookOpen size={20} />}
+                      </div>
+                      <div className="dash-course-info">
+                        <span className="dash-course-name">{course.subject}</span>
+                        <span className="dash-course-meta">
+                          {course.teacher ? `${course.teacher} · ` : ''}€{course.hourly_price}/hr
+                          {course.level ? ` · ${course.level}` : ''}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default DashboardPage;
